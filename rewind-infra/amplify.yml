@@ -1,0 +1,22 @@
+
+version: 1
+applications:
+  - appRoot: rewind-ui
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - yarn install
+        build:
+          commands:
+            - yarn build
+      artifacts:
+        baseDirectory: .next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+          - .next/cache/**/*
+    # This is critical for SSR support
+    platform: WEB_COMPUTE
