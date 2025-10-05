@@ -66,7 +66,7 @@ const developers: Developer[] = [
     },
   },
   {
-    name: 'Joaquin Ríos',
+    name: 'Joaquín Ríos',
     title: 'Software Engineer',
     company: 'Datadog',
     ign: 'Blackstar#288',
@@ -144,8 +144,8 @@ export default function AboutPage() {
             {/* Content */}
             <div className="space-y-6 text-white/90 text-lg md:text-xl leading-relaxed text-center max-w-6xl mx-auto mb-16">
               <p className="md:text-3xl font-medium pb-4">
-                We're a team of passionate hackers, League of Legends players, and esports enthusiasts 
-                who've experienced the thrill of Worlds firsthand — multiple times. We know what it's 
+                We&apos;re a team of passionate hackers, League of Legends players, and esports enthusiasts 
+                who&apos;ve experienced the thrill of Worlds firsthand — multiple times. We know what it&apos;s 
                 like to live and breathe this game.
               </p>
               <p>
@@ -159,7 +159,7 @@ export default function AboutPage() {
                   AWS and Riot Games Hackathon
                 </a>
                 , challenging developers to build AI-powered agents that transform League API match data 
-                into personalized insights. Using AWS AI services like Amazon Bedrock, we're creating 
+                into personalized insights. Using AWS AI services like Amazon Bedrock, we&apos;re creating 
                 intelligent year-end recaps that go beyond basic stats.
               </p>
             </div>
