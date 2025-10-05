@@ -6,7 +6,7 @@ import SimpleIcon from '@/components/SimpleIcon';
 
 export default function Footer() {
   return (
-    <footer className="relative z-10 mt-auto w-full">
+    <footer className="relative z-10 w-full">
       <div className="w-full px-4 md:px-8 py-6 md:py-4 backdrop-blur-md bg-gradient-to-t from-black/30 to-transparent">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-4">
           {/* Links Section - Shows FIRST on mobile, second on desktop */}
