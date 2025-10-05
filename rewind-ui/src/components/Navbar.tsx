@@ -53,7 +53,7 @@ export default function Navbar() {
             WORLDS25
           </Link>
           <Link 
-            href="/community" 
+            href="/about" 
             className="text-white/70 hover:text-white text-lg font-semibold transition-colors"
           >
             ABOUT
@@ -140,7 +140,7 @@ export default function Navbar() {
             WORLDS25
           </Link>
           <Link 
-            href="/community" 
+            href="/about" 
             className="text-white/70 hover:text-white text-xl font-semibold transition-colors"
             onClick={() => setIsMenuOpen(false)}
           >
