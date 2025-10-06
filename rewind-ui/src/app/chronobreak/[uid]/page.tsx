@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useParams, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import Navbar from '@/components/Navbar';
-import BlobBackground from '@/components/BlobBackground';
-import Footer from '@/components/Footer';
+import { useParams, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import Navbar from "@/components/Navbar";
+import BlobBackground from "@/components/BlobBackground";
+import Footer from "@/components/Footer";
 
 export default function ChronobreakPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const uid = params.uid as string;
-  const hasTransition = searchParams.get('transition') === 'true';
+  const hasTransition = searchParams.get("transition") === "true";
   const [showTransition, setShowTransition] = useState(hasTransition);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function ChronobreakPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <BlobBackground 
-        colors={['#3B82F6', '#10B981', '#FCD34D']}
+        colors={["#3B82F6", "#10B981", "#FCD34D"]}
         blobCount={3}
         minSizePercent={35}
         maxSizePercent={50}
@@ -39,7 +39,7 @@ export default function ChronobreakPage() {
             <div className="break-words">
               <span 
                 className="text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight"
-                style={{ fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)' }}
+                style={{ fontFamily: "var(--font-zalando-sans, \"Zalando Sans Expanded\", sans-serif)" }}
               >
                 CHRONOBREAK
               </span>
@@ -69,7 +69,7 @@ export default function ChronobreakPage() {
         <div 
           className="fixed inset-0 z-[9998] pointer-events-none animate-fadeOut"
           style={{
-            background: 'radial-gradient(circle, white 0%, rgba(255,255,255,0.7) 30%, rgba(255,255,255,0.3) 60%, transparent 100%)',
+            background: "radial-gradient(circle, white 0%, rgba(255,255,255,0.7) 30%, rgba(255,255,255,0.3) 60%, transparent 100%)",
           }}
         />
       )}

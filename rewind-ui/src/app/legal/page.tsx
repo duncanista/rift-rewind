@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Navbar from '@/components/Navbar';
-import BlobBackground from '@/components/BlobBackground';
-import Footer from '@/components/Footer';
+import React from "react";
+import Navbar from "@/components/Navbar";
+import BlobBackground from "@/components/BlobBackground";
+import Footer from "@/components/Footer";
 
 export default function LegalPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <BlobBackground 
-        colors={['#8B5CF6', '#EC4899', '#1E40AF']}
+        colors={["#8B5CF6", "#EC4899", "#1E40AF"]}
         blobCount={3}
         minSizePercent={35}
         maxSizePercent={50}
@@ -23,7 +23,7 @@ export default function LegalPage() {
           <div className="text-center space-y-6">
             <h1 
               className="text-5xl md:text-7xl font-bold text-white leading-tight"
-              style={{ fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)' }}
+              style={{ fontFamily: "var(--font-zalando-sans, \"Zalando Sans Expanded\", sans-serif)" }}
             >
               LEGAL
             </h1>
@@ -121,7 +121,7 @@ export default function LegalPage() {
               <div className="space-y-4 text-base md:text-lg leading-relaxed">
                 <p>
                   If you have any questions or concerns regarding the content on this website or its compliance with 
-                  Riot Games&apos; policies, please contact us through our{' '}
+                  Riot Games&apos; policies, please contact us through our{" "}
                   <a 
                     href="https://github.com/duncanista/rift-rewind" 
                     target="_blank" 

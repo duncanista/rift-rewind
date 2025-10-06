@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { User, History, Menu, X, ClockFading } from 'lucide-react';
-import { siGithub, siX } from 'simple-icons';
-import SimpleIcon from '@/components/SimpleIcon';
+import React, { useState } from "react";
+import Link from "next/link";
+import { User, History, Menu, X, ClockFading } from "lucide-react";
+import { siGithub, siX } from "simple-icons";
+import SimpleIcon from "@/components/SimpleIcon";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,19 +20,19 @@ export default function Navbar() {
               <History 
                 className={`absolute inset-0 w-6 h-6 md:w-8 md:h-8 text-white transition-all duration-500 ease-in-out md:opacity-100 md:rotate-0 ${
                   isMenuOpen 
-                    ? 'opacity-0 -rotate-180 scale-50' 
-                    : 'opacity-100 rotate-0 scale-100'
+                    ? "opacity-0 -rotate-180 scale-50" 
+                    : "opacity-100 rotate-0 scale-100"
                 }`}
               />
               <ClockFading 
                 className={`absolute inset-0 w-6 h-6 md:w-8 md:h-8 text-white transition-all duration-500 ease-in-out md:opacity-0 md:-rotate-180 ${
                   isMenuOpen 
-                    ? 'opacity-100 rotate-0 scale-100' 
-                    : 'opacity-0 rotate-180 scale-50'
+                    ? "opacity-100 rotate-0 scale-100" 
+                    : "opacity-0 rotate-180 scale-50"
                 }`}
               />
             </div>
-            <span className="text-2xl md:text-4xl font-medium text-white" style={{ fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)' }}>
+            <span className="text-2xl md:text-4xl font-medium text-white" style={{ fontFamily: "var(--font-zalando-sans, \"Zalando Sans Expanded\", sans-serif)" }}>
               RIFT REWIND
             </span>
           </Link>
@@ -98,15 +98,15 @@ export default function Navbar() {
             <Menu 
               className={`absolute inset-0 w-6 h-6 transition-all duration-300 ease-in-out ${
                 isMenuOpen 
-                  ? 'opacity-0 rotate-90 scale-75' 
-                  : 'opacity-100 rotate-0 scale-100'
+                  ? "opacity-0 rotate-90 scale-75" 
+                  : "opacity-100 rotate-0 scale-100"
               }`}
             />
             <X 
               className={`absolute inset-0 w-6 h-6 transition-all duration-300 ease-in-out ${
                 isMenuOpen 
-                  ? 'opacity-100 rotate-0 scale-100' 
-                  : 'opacity-0 -rotate-90 scale-75'
+                  ? "opacity-100 rotate-0 scale-100" 
+                  : "opacity-0 -rotate-90 scale-75"
               }`}
             />
           </div>
@@ -117,12 +117,12 @@ export default function Navbar() {
       <div 
         className={`md:hidden absolute top-20 left-0 right-0 bg-black/95 backdrop-blur-lg border-t border-white/10 overflow-hidden transition-all duration-500 ease-in-out ${
           isMenuOpen 
-            ? 'max-h-[500px] opacity-100' 
-            : 'max-h-0 opacity-0'
+            ? "max-h-[500px] opacity-100" 
+            : "max-h-0 opacity-0"
         }`}
       >
         <div className={`flex flex-col px-6 py-6 space-y-6 transition-transform duration-500 ease-out ${
-          isMenuOpen ? 'translate-y-0' : '-translate-y-4'
+          isMenuOpen ? "translate-y-0" : "-translate-y-4"
         }`}>
           {/* Navigation Links */}
           <Link 

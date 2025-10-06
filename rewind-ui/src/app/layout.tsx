@@ -1,65 +1,65 @@
-import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
-import './globals.css';
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
 
 const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: 'Rift Rewind | Your League of Legends Year in Review',
-  description: 'Experience your League of Legends journey like never before. Rift Rewind transforms your match data into personalized, AI-powered insights and year-end recaps. Built with AWS AI services for the AWS and Riot Games Hackathon.',
+  title: "Rift Rewind | Your League of Legends Year in Review",
+  description: "Experience your League of Legends journey like never before. Rift Rewind transforms your match data into personalized, AI-powered insights and year-end recaps. Built with AWS AI services for the AWS and Riot Games Hackathon.",
   keywords: [
-    'AWS',
-    'year in review',
-    'gaming stats',
-    'match history',
-    'AI insights',
-    'esports',
-    'gaming analytics',
-    'summoner stats',
-    'League stats',
-    'Amazon Bedrock',
+    "AWS",
+    "year in review",
+    "gaming stats",
+    "match history",
+    "AI insights",
+    "esports",
+    "gaming analytics",
+    "summoner stats",
+    "League stats",
+    "Amazon Bedrock",
   ],
   authors: [
-    { name: 'Jordan González' },
-    { name: 'Joaquín Ríos' },
-    { name: 'Uri Elías' },
+    { name: "Jordan González" },
+    { name: "Joaquín Ríos" },
+    { name: "Uri Elías" },
   ],
-  creator: 'Rift Rewind Team',
-  publisher: 'Rift Rewind',
-  metadataBase: new URL('https://riftrewind.lol'),
+  creator: "Rift Rewind Team",
+  publisher: "Rift Rewind",
+  metadataBase: new URL("https://riftrewind.lol"),
   alternates: {
-    canonical: '/',
+    canonical: "/",
   },
   openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: 'https://riftrewind.lol',
-    title: 'Rift Rewind | Your LoL Year in Review',
-    description: 'Experience your League of Legends journey like never before. Get personalized, AI-powered insights and year-end recaps of your matches.',
-    siteName: 'Rift Rewind',
+    type: "website",
+    locale: "en_US",
+    url: "https://riftrewind.lol",
+    title: "Rift Rewind | Your LoL Year in Review",
+    description: "Experience your League of Legends journey like never before. Get personalized, AI-powered insights and year-end recaps of your matches.",
+    siteName: "Rift Rewind",
     images: [
       {
-        url: '/og-image.png',
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: 'Rift Rewind - LoL Year in Review',
+        alt: "Rift Rewind - LoL Year in Review",
       },
     ],
   },
   twitter: {
     // card: "summary_large_image",
-    title: 'Rift Rewind | Your LoL Year in Review',
-    description: 'Experience your League of Legends journey like never before. Get personalized, AI-powered insights and year-end recaps.',
-    images: ['/og-image.png'],
-    creator: '@jordan_nebula',
+    title: "Rift Rewind | Your LoL Year in Review",
+    description: "Experience your League of Legends journey like never before. Get personalized, AI-powered insights and year-end recaps.",
+    images: ["/og-image.png"],
+    creator: "@jordan_nebula",
   },
   robots: {
     index: true,
@@ -67,33 +67,33 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   icons: {
     icon: [
-      { url: '/favicon/favicon.ico' },
-      { url: '/favicon/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+      { url: "/favicon/favicon.ico" },
+      { url: "/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png" },
     ],
-    shortcut: '/favicon/favicon.ico',
-    apple: '/favicon/apple-touch-icon.png',
+    shortcut: "/favicon/favicon.ico",
+    apple: "/favicon/apple-touch-icon.png",
     other: [
       {
-        rel: 'icon',
-        type: 'image/svg+xml',
-        url: '/favicon/favicon.svg',
+        rel: "icon",
+        type: "image/svg+xml",
+        url: "/favicon/favicon.svg",
       },
     ],
   },
-  manifest: '/favicon/site.webmanifest',
+  manifest: "/favicon/site.webmanifest",
   viewport: {
-    width: 'device-width',
+    width: "device-width",
     initialScale: 1,
     maximumScale: 5,
   },
-  category: 'gaming',
+  category: "gaming",
 };
 
 export default function RootLayout({

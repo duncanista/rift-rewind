@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 
 interface Blob {
   x: number;
@@ -24,7 +24,7 @@ interface BlobBackgroundProps {
 }
 
 export default function BlobBackground({
-  colors = ['#8B5CF6', '#EC4899', '#1E40AF'],
+  colors = ["#8B5CF6", "#EC4899", "#1E40AF"],
   blobCount = 3,
   sizeMultiplier = 3.5,
   minSizePercent = 40,
@@ -39,7 +39,7 @@ export default function BlobBackground({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     // Set canvas size
@@ -48,7 +48,7 @@ export default function BlobBackground({
       canvas.height = window.innerHeight;
     };
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener("resize", resizeCanvas);
 
     // Helper function to generate random organic blob points
     const generateBlobPoints = (numPoints: number = 8) => {
@@ -101,8 +101,8 @@ export default function BlobBackground({
       resizeCanvas();
       initBlobs();
     };
-    window.removeEventListener('resize', resizeCanvas);
-    window.addEventListener('resize', handleResize);
+    window.removeEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", handleResize);
 
     // Simple noise function for organic movement
     const noise = (x: number) => {
@@ -205,7 +205,7 @@ export default function BlobBackground({
 
         gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.7)`);
         gradient.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, 0.4)`);
-        gradient.addColorStop(1, 'transparent');
+        gradient.addColorStop(1, "transparent");
 
         ctx.fillStyle = gradient;
         ctx.fill();
@@ -218,7 +218,7 @@ export default function BlobBackground({
     animate();
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { siGithub } from 'simple-icons';
-import SimpleIcon from '@/components/SimpleIcon';
+import React from "react";
+import { siGithub } from "simple-icons";
+import SimpleIcon from "@/components/SimpleIcon";
 
 export default function Footer() {
   return (

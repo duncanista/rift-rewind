@@ -1,32 +1,32 @@
-'use client';
+"use client";
 
-import Navbar from '@/components/Navbar';
-import BlobBackground from '@/components/BlobBackground';
-import Footer from '@/components/Footer';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { useState, FormEvent, useMemo, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import Navbar from "@/components/Navbar";
+import BlobBackground from "@/components/BlobBackground";
+import Footer from "@/components/Footer";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { useState, FormEvent, useMemo, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
-  const [riotId, setRiotId] = useState('');
-  const [region, setRegion] = useState('na1');
+  const [riotId, setRiotId] = useState("");
+  const [region, setRegion] = useState("na1");
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFading, setIsFading] = useState(false);
   const [pendingUid, setPendingUid] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   
   // Memoize colors array to prevent BlobBackground from re-initializing on every render
-  const blobColors = useMemo(() => ['#8B5CF6', '#EC4899', '#1E40AF'], []);
+  const blobColors = useMemo(() => ["#8B5CF6", "#EC4899", "#1E40AF"], []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     // Validate Riot ID format (GameName#TAG)
-    if (!riotId.includes('#')) {
-      alert('Please enter a valid Riot ID in the format: GameName#TAG');
+    if (!riotId.includes("#")) {
+      alert("Please enter a valid Riot ID in the format: GameName#TAG");
       return;
     }
 
@@ -48,7 +48,7 @@ export default function Home() {
     if (isPlaying && videoRef.current && pendingUid) {
       const video = videoRef.current;
       video.play().catch((error) => {
-        console.error('Error playing video:', error);
+        console.error("Error playing video:", error);
         // If video fails to play, redirect immediately
         router.push(`/chronobreak/${pendingUid}`);
       });
@@ -58,10 +58,10 @@ export default function Home() {
         router.push(`/chronobreak/${pendingUid}?transition=true`);
       };
       
-      video.addEventListener('ended', handleEnded);
+      video.addEventListener("ended", handleEnded);
       
       return () => {
-        video.removeEventListener('ended', handleEnded);
+        video.removeEventListener("ended", handleEnded);
       };
     }
   }, [isPlaying, pendingUid, router]);
@@ -83,7 +83,7 @@ export default function Home() {
             <div className="break-words">
               <span 
                 className="text-white text-3xl sm:text-5xl md:text-7xl font-bold leading-tight"
-                style={{ fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)' }}
+                style={{ fontFamily: "var(--font-zalando-sans, \"Zalando Sans Expanded\", sans-serif)" }}
               >
                 CHRONOBREAK
               </span>
@@ -150,10 +150,10 @@ export default function Home() {
         <div 
           className="fixed inset-0 z-[9998] pointer-events-none animate-fadeIn"
           style={{
-            background: 'radial-gradient(circle, transparent 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.7) 60%, black 100%)',
-            animationDuration: '2s',
-            animationTimingFunction: 'ease-in',
-            animationFillMode: 'forwards',
+            background: "radial-gradient(circle, transparent 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.7) 60%, black 100%)",
+            animationDuration: "2s",
+            animationTimingFunction: "ease-in",
+            animationFillMode: "forwards",
           }}
         />
       )}
