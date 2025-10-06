@@ -1,7 +1,7 @@
 name: rewind-ui build
 
 on:
-  push:
+  pull_request:
 
 jobs:
   lint:
