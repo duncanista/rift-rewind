@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import Image from "next/image";
+import Image from 'next/image';
 
 interface Champion {
   name: string;
@@ -17,7 +17,7 @@ export default function TopChampionsScene({ champions }: TopChampionsSceneProps)
     <div className="fixed inset-0 z-[9998] flex items-center justify-center pointer-events-none">
       <div className="w-full max-w-4xl px-4 animate-fadeIn">
         {/* Title */}
-        <h2 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 md:mb-12" style={{ fontFamily: "var(--font-zalando-sans, \"Zalando Sans Expanded\", sans-serif)" }}>
+        <h2 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 md:mb-12" style={{ fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)' }}>
           YOUR TOP 5 CHAMPIONS
         </h2>
         <p className="text-gray-300 text-lg md:text-xl text-center mb-8 md:mb-12">

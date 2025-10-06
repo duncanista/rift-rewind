@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 interface StoryProgressBarProps {
   totalStories: number;
@@ -27,10 +27,10 @@ export default function StoryProgressBar({
               className="h-full bg-white rounded-full transition-all duration-100 ease-linear"
               style={{
                 width: index < currentStoryIndex 
-                  ? "100%" 
+                  ? '100%' 
                   : index === currentStoryIndex 
                     ? `${storyProgress}%` 
-                    : "0%",
+                    : '0%'
               }}
             />
           </div>
