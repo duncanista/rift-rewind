@@ -135,6 +135,7 @@ export default function ChronobreakPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const uid = params.uid as string;
+  const region = searchParams.get("region") || "na1"; // Default to na1 if not provided
   const hasTransition = searchParams.get("transition") === "true";
   const [showTransition, setShowTransition] = useState(hasTransition);
   
@@ -246,7 +247,7 @@ export default function ChronobreakPage() {
         // Decode the uid to get the summoner name (e.g., "GameName#TAG")
         const summonerName = decodeURIComponent(uid);
         
-        console.log(`Fetching data for summoner: ${summonerName}`);
+        console.log(`Fetching data for summoner: ${summonerName} in region: ${region}`);
         
         const response = await fetch(LAMBDA_FUNCTION_URL, {
           method: "POST",
@@ -255,6 +256,7 @@ export default function ChronobreakPage() {
           },
           body: JSON.stringify({
             summoner: summonerName,
+            region: region,
           }),
         });
 
@@ -279,7 +281,7 @@ export default function ChronobreakPage() {
     };
 
     fetchData();
-  }, [uid]);
+  }, [uid, region]);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
