@@ -35,6 +35,13 @@ export default function Footer() {
             <span className="text-base md:text-sm font-medium text-white/35 cursor-not-allowed">
               Devpost
             </span>
+
+            <a
+              href="/legal"
+              className="text-base md:text-sm font-medium text-white/60 hover:text-white/90 transition-colors"
+            >
+              Legal
+            </a>
           </div>
 
           {/* Legal Section - Shows SECOND on mobile, first on desktop */}
