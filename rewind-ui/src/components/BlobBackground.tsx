@@ -70,17 +70,17 @@ export default function BlobBackground({
       // Use Math.floor to ensure we're at exact pixel center
       const centerX = Math.floor(canvas.width / 2);
       const centerY = Math.floor(canvas.height / 2);
-      
+
       // Make blob size responsive to screen size with configurable values
       const screenSize = Math.min(canvas.width, canvas.height);
-      const baseRadius = (screenSize * (minSizePercent / 100)) * sizeMultiplier;
-      const maxRadius = (screenSize * (maxSizePercent / 100)) * sizeMultiplier;
+      const baseRadius = screenSize * (minSizePercent / 100) * sizeMultiplier;
+      const maxRadius = screenSize * (maxSizePercent / 100) * sizeMultiplier;
       const radiusVariation = maxRadius - baseRadius;
-      
+
       for (let i = 0; i < blobCount; i++) {
         const angle = (i / blobCount) * Math.PI * 2;
         const distance = screenSize * (centerOffset / 100);
-        
+
         blobsRef.current.push({
           x: centerX + Math.cos(angle) * distance,
           y: centerY + Math.sin(angle) * distance,
@@ -93,14 +93,9 @@ export default function BlobBackground({
           points: generateBlobPoints(8 + Math.floor(Math.random() * 4)),
         });
       }
-      
-      // Debug log to check centering
-      console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
-      console.log('Center point:', centerX, centerY);
-      console.log('Initial blob positions:', blobsRef.current.map(b => ({ x: b.x, y: b.y })));
     };
     initBlobs();
-    
+
     // Reinitialize on resize to maintain proper sizing
     const handleResize = () => {
       resizeCanvas();
@@ -160,9 +155,7 @@ export default function BlobBackground({
         blob.y += blob.vy;
 
         // Hard constraint to keep blobs very close to center
-        const distFromCenterAfter = Math.sqrt(
-          Math.pow(centerX - blob.x, 2) + Math.pow(centerY - blob.y, 2)
-        );
+        const distFromCenterAfter = Math.sqrt(Math.pow(centerX - blob.x, 2) + Math.pow(centerY - blob.y, 2));
         if (distFromCenterAfter > attractionRadius) {
           const angle = Math.atan2(blob.y - centerY, blob.x - centerX);
           blob.x = centerX + Math.cos(angle) * attractionRadius;
@@ -178,23 +171,23 @@ export default function BlobBackground({
         blob.points.forEach((point, i) => {
           const angle = (i / blob.points.length) * Math.PI * 2;
           const nextAngle = ((i + 1) / blob.points.length) * Math.PI * 2;
-          
+
           // Add very subtle noise-based variation for minimal morphing
           const radiusVariation = noise(blob.noiseOffsetX + i) * 0.08 + 1;
           const radius = blob.radius * point.x * radiusVariation;
-          
+
           const x = Math.cos(angle) * radius;
           const y = Math.sin(angle) * radius;
-          
+
           const nextRadiusVariation = noise(blob.noiseOffsetY + i + 1) * 0.08 + 1;
           const nextRadius = blob.radius * blob.points[(i + 1) % blob.points.length].y * nextRadiusVariation;
           const nextX = Math.cos(nextAngle) * nextRadius;
           const nextY = Math.sin(nextAngle) * nextRadius;
-          
+
           if (i === 0) {
             ctx.moveTo(x, y);
           }
-          
+
           // Use quadratic curves for smooth organic shapes
           const cpX = (x + nextX) / 2;
           const cpY = (y + nextY) / 2;
@@ -204,7 +197,7 @@ export default function BlobBackground({
 
         // Create gradient
         const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, blob.radius);
-        
+
         // Parse hex color to rgb for opacity control
         const r = parseInt(blob.color.slice(1, 3), 16);
         const g = parseInt(blob.color.slice(3, 5), 16);
@@ -216,7 +209,7 @@ export default function BlobBackground({
 
         ctx.fillStyle = gradient;
         ctx.fill();
-        
+
         ctx.restore();
       });
 
@@ -235,12 +228,8 @@ export default function BlobBackground({
   return (
     <>
       <div className="fixed inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0f0f1a] to-[#0a0a0a] -z-20" />
-      <canvas
-        ref={canvasRef}
-        className="fixed inset-0 w-full h-full -z-10"
-      />
+      <canvas ref={canvasRef} className="fixed inset-0 w-full h-full -z-10" />
       <div className="fixed inset-0 backdrop-blur-[80px] -z-10" />
     </>
   );
 }
-

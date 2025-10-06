@@ -153,7 +153,7 @@ export default function Home() {
             background: 'radial-gradient(circle, transparent 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.7) 60%, black 100%)',
             animationDuration: '2s',
             animationTimingFunction: 'ease-in',
-            animationFillMode: 'forwards'
+            animationFillMode: 'forwards',
           }}
         />
       )}
