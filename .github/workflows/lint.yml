@@ -1,0 +1,18 @@
+name: Linter
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: cd rewind-ui && yarn install
+
+      - name: Run linter
+        run: yarn lint --fix
