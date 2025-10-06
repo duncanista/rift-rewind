@@ -1,5 +1,7 @@
+export { default as HoursPlayedScene } from "./HoursPlayedScene";
 export { default as TopChampionsScene } from "./TopChampionsScene";
 export { default as TopRolesScene } from "./TopRolesScene";
+export { default as Top2RolesScene } from "./Top2RolesScene";
 export { default as SummaryScene } from "./SummaryScene";
 export { default as RectangleAnimation } from "./RectangleAnimation";
 export { default as FloatingLogo } from "./FloatingLogo";
