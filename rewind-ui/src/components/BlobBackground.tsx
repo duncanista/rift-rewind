@@ -111,7 +111,6 @@ export default function BlobBackground({
 
     // Simple noise function for organic movement
     const noise = (x: number) => {
-      const X = Math.floor(x) & 255;
       x -= Math.floor(x);
       const fade = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
       return fade(x);
@@ -130,7 +129,6 @@ export default function BlobBackground({
         // Calculate distance from center
         const dx = centerX - blob.x;
         const dy = centerY - blob.y;
-        const distFromCenter = Math.sqrt(dx * dx + dy * dy);
 
         // Strong attraction to keep blobs centered
         const pullStrength = 0.001;
