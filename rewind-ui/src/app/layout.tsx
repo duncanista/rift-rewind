@@ -47,18 +47,19 @@ export const metadata: Metadata = {
     siteName: "Rift Rewind",
     images: [
       {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Rift Rewind - LoL Year in Review",
+        url: "/favicon/favicon.svg",
+        width: 512,
+        height: 512,
+        alt: "Rift Rewind Logo",
+        type: "image/svg+xml",
       },
     ],
   },
   twitter: {
-    // card: "summary_large_image",
+    card: "summary",
     title: "Rift Rewind | Your LoL Year in Review",
     description: "Experience your League of Legends journey like never before. Get personalized, AI-powered insights and year-end recaps.",
-    images: ["/og-image.png"],
+    images: ["/favicon/favicon.svg"],
     creator: "@jordan_nebula",
   },
   robots: {
