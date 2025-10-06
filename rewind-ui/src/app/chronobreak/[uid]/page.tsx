@@ -6,16 +6,87 @@ import Navbar from "@/components/Navbar";
 import BlobBackground from "@/components/BlobBackground";
 import Footer from "@/components/Footer";
 import { 
+  HoursPlayedScene,
   TopChampionsScene, 
-  TopRolesScene, 
+  TopRolesScene,
+  Top2RolesScene, 
   SummaryScene, 
   RectangleAnimation, 
   FloatingLogo, 
   StoryProgressBar, 
 } from "@/components/chronobreak";
 
+// Mock aggregated data from backend
+// TODO: Replace with actual API call when backend is connected
+const MOCK_AGGREGATED_DATA = {
+  pings: {
+    allInPings: 2,
+    assistMePings: 41,
+    basicPings: 0,
+    commandPings: 150,
+    dangerPings: 0,
+    enemyMissingPings: 88,
+    enemyVisionPings: 113,
+    getBackPings: 41,
+    holdPings: 0,
+    needVisionPings: 17,
+    onMyWayPings: 346,
+    pushPings: 16,
+    visionClearedPings: 0,
+  },
+  kills: 43,
+  deaths: 63,
+  assists: 96,
+  cs: 1513,
+  vision_score: 217,
+  wards_placed: 106,
+  wards_killed: 26,
+  early_surrender: 0,
+  first_blood: 4,
+  match_duration: 17192,
+  won: 8,
+  lost: 2,
+  champions: {
+    Morgana: 7,
+    Qiyana: 1,
+    Lux: 1,
+    Mordekaiser: 1,
+  },
+  positions: {
+    TOP: 1,
+    JUNGLE: 0,
+    MIDDLE: 9,
+    BOTTOM: 0,
+    UTILITY: 0,
+  },
+};
+
 // Animation scene configuration
-type AnimationScene = "idle" | "scene1" | "roles" | "summary";
+type AnimationScene = "idle" | "hours" | "scene1" | "roles" | "top2roles" | "summary";
+
+// Helper function to map API position names to UI display names
+function mapPositionName(position: string): string {
+  const mapping: Record<string, string> = {
+    TOP: "Top",
+    JUNGLE: "Jungle",
+    MIDDLE: "Mid",
+    BOTTOM: "ADC",
+    UTILITY: "Support",
+  };
+  return mapping[position] || position;
+}
+
+// Helper function to get position icon path
+function getPositionIcon(position: string): string {
+  const iconMapping: Record<string, string> = {
+    TOP: "/images/position/top.svg",
+    JUNGLE: "/images/position/jgl.svg",
+    MIDDLE: "/images/position/mid.svg",
+    BOTTOM: "/images/position/adc.svg",
+    UTILITY: "/images/position/sup.svg",
+  };
+  return iconMapping[position] || "/images/position/mid.svg";
+}
 
 export default function ChronobreakPage() {
   const params = useParams();
@@ -29,8 +100,10 @@ export default function ChronobreakPage() {
   const [currentScene, setCurrentScene] = useState<AnimationScene>("idle");
   const [isAnimating, setIsAnimating] = useState(false);
   const [showRectangles, setShowRectangles] = useState(false);
+  const [showHours, setShowHours] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showRoles, setShowRoles] = useState(false);
+  const [showTop2Roles, setShowTop2Roles] = useState(false);
   
   // Refs to track timeouts for cleanup
   const timeoutRefs = useRef<NodeJS.Timeout[]>([]);
@@ -38,39 +111,67 @@ export default function ChronobreakPage() {
   // Story progress management
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [storyProgress, setStoryProgress] = useState(0);
-  const totalStories = 3; // 1 story scene + 1 roles scene + 1 summary scene
+  const totalStories = 5; // 1 hours played + 1 top champions scene + 1 top 2 roles scene + 1 top 5 roles scene + 1 summary scene
   const storyDuration = 10000; // 10 seconds per story
   
-  // TODO: Replace with real data from API
-  const topChampions = [
-    { name: "Katarina", games: 15, icon: "/images/champions/katarina-splashart.webp" },
-    { name: "Lux", games: 12, icon: "/images/champions/lux-splashart.webp" },
-    { name: "Udyr", games: 10, icon: "/images/champions/udyr-splashart.webp" },
-    { name: "Yasuo", games: 8, icon: "/images/champions/katarina-splashart.webp" },
-    { name: "Zed", games: 7, icon: "/images/champions/lux-splashart.webp" },
-  ];
+  // Transform aggregated data for components
+  const totalGames = MOCK_AGGREGATED_DATA.won + MOCK_AGGREGATED_DATA.lost;
+  
+  // Calculate hours played (match_duration is in seconds, convert to hours and round up)
+  const hoursPlayed = Math.ceil(MOCK_AGGREGATED_DATA.match_duration / 3600);
+  
+  // Top 5 Champions - sorted by games played
+  // TODO: Update icon paths with real champion splash art URLs from backend
+  // TODO: Update "In your last X games" text dynamically based on actual game count
+  const topChampions = Object.entries(MOCK_AGGREGATED_DATA.champions)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5)
+    .map(([name, games]) => ({
+      name,
+      games,
+      // Using existing placeholder images for now
+      icon: name === "Lux" ? "/images/champions/lux-splashart.webp" : 
+        name === "Morgana" ? "/images/champions/katarina-splashart.webp" :
+          "/images/champions/udyr-splashart.webp",
+    }));
 
-  // TODO: Replace with real data from API
+  // Top 5 Roles with percentages
+  // TODO: Calculate percentages based on dynamic total games instead of hardcoded 10
+  const topRoles = Object.entries(MOCK_AGGREGATED_DATA.positions)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5)
+    .filter(([, games]) => games > 0)
+    .map(([position, games]) => ({
+      name: mapPositionName(position),
+      games,
+      percentage: Math.round((games / totalGames) * 100),
+      icon: getPositionIcon(position),
+    }));
+
+  // Top 2 Roles for separate scene and summary
+  const top2Roles = topRoles.slice(0, 2);
+
+  // Summary Stats
+  const kdaRatio = MOCK_AGGREGATED_DATA.deaths > 0 
+    ? ((MOCK_AGGREGATED_DATA.kills + MOCK_AGGREGATED_DATA.assists) / MOCK_AGGREGATED_DATA.deaths).toFixed(2)
+    : ((MOCK_AGGREGATED_DATA.kills + MOCK_AGGREGATED_DATA.assists)).toFixed(2);
+  
+  const uniqueChampionsCount = Object.keys(MOCK_AGGREGATED_DATA.champions).length;
+  const surrenderPercentage = (MOCK_AGGREGATED_DATA.early_surrender / totalGames) * 100;
+  
   const summaryStats = {
-    kda: { kills: 156, deaths: 142, assists: 312 },
-    kdaRatio: "3.29",
-    championsPlayed: 23,
-    totalDeaths: 142,
-    topRoles: [
-      { name: "Top", icon: "/images/position/top.svg" },
-      { name: "Support", icon: "/images/position/sup.svg" },
-    ],
-    ffCount: 12,
+    kda: { 
+      kills: MOCK_AGGREGATED_DATA.kills, 
+      deaths: MOCK_AGGREGATED_DATA.deaths, 
+      assists: MOCK_AGGREGATED_DATA.assists, 
+    },
+    kdaRatio,
+    championsPlayed: uniqueChampionsCount,
+    totalDeaths: MOCK_AGGREGATED_DATA.deaths,
+    topRoles: top2Roles,
+    ffCount: MOCK_AGGREGATED_DATA.early_surrender,
+    ffText: surrenderPercentage < 5 ? "you never gave up!" : "times you said \"gg go next\"",
   };
-
-  // TODO: Replace with real data from API
-  const topRoles = [
-    { name: "Top", games: 45, percentage: 32, icon: "/images/position/top.svg" },
-    { name: "Support", games: 38, percentage: 27, icon: "/images/position/sup.svg" },
-    { name: "Mid", games: 28, percentage: 20, icon: "/images/position/mid.svg" },
-    { name: "ADC", games: 15, percentage: 11, icon: "/images/position/adc.svg" },
-    { name: "Jungle", games: 12, percentage: 10, icon: "/images/position/jgl.svg" },
-  ];
 
   // Redirect to home if no uid is provided
   useEffect(() => {
@@ -104,15 +205,18 @@ export default function ChronobreakPage() {
     timeoutRefs.current = [];
     
     // Immediately clear all scene states to prevent overlap
+    setShowHours(false);
     setShowStats(false);
     setShowRoles(false);
+    setShowTop2Roles(false);
     setShowRectangles(false);
     
     setCurrentStoryIndex(index);
     setStoryProgress(0);
     setIsAnimating(true);
     
-    // Check if this is the summary scene (last story)
+    // Scene sequence: hours -> scene1 (top champions) -> top2roles (top 2) -> roles (top 5) -> summary
+    // Check if this is the summary scene (last story, index 4)
     if (index === totalStories - 1) {
       setCurrentScene("summary");
       // Use setTimeout to ensure state is cleared first
@@ -121,8 +225,8 @@ export default function ChronobreakPage() {
       }, 0);
       timeoutRefs.current.push(timeout);
     } 
-    // Check if this is the roles scene (second to last story)
-    else if (index === totalStories - 2) {
+    // Check if this is the top 5 roles scene (index 3)
+    else if (index === 3) {
       setCurrentScene("roles");
       // Use setTimeout to ensure state is cleared first
       const timeout = setTimeout(() => {
@@ -130,8 +234,19 @@ export default function ChronobreakPage() {
         setShowRoles(true);
       }, 0);
       timeoutRefs.current.push(timeout);
+    }
+    // Check if this is the top 2 roles scene (index 2)
+    else if (index === 2) {
+      setCurrentScene("top2roles");
+      // Use setTimeout to ensure state is cleared first
+      const timeout = setTimeout(() => {
+        setShowRectangles(true);
+        setShowTop2Roles(true);
+      }, 0);
+      timeoutRefs.current.push(timeout);
     } 
-    else {
+    // Top champions scene (index 1)
+    else if (index === 1) {
       setCurrentScene("scene1");
       
       // Wait 700ms for content to fade out, then show rectangles
@@ -145,6 +260,16 @@ export default function ChronobreakPage() {
         setShowStats(true);
       }, 2200);
       timeoutRefs.current.push(timeout2);
+    }
+    // Hours played scene (index 0)
+    else {
+      setCurrentScene("hours");
+      // Use setTimeout to ensure state is cleared first
+      const timeout = setTimeout(() => {
+        setShowRectangles(true);
+        setShowHours(true);
+      }, 0);
+      timeoutRefs.current.push(timeout);
     }
   };
 
@@ -160,8 +285,10 @@ export default function ChronobreakPage() {
       console.log("All stories completed");
       setIsAnimating(false);
       setShowRectangles(false);
+      setShowHours(false);
       setShowStats(false);
       setShowRoles(false);
+      setShowTop2Roles(false);
       setCurrentScene("idle");
     }
   };
@@ -283,12 +410,12 @@ export default function ChronobreakPage() {
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium mb-4 md:mb-6">
             <div className="break-words">
               <span 
-                className="text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight"
+                className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight"
                 style={{ fontFamily: "var(--font-zalando-sans, \"Zalando Sans Expanded\", sans-serif)" }}
               >
                 CHRONOBREAK
               </span>
-              <span className="text-white text-3xl sm:text-4xl md:text-5xl"> Activated</span>
+              <span className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl"> Activated</span>
             </div>
           </h1>
           <p className="text-gray-400 text-base sm:text-lg md:text-xl mb-6 md:mb-8 px-4">
@@ -312,6 +439,9 @@ export default function ChronobreakPage() {
       {/* Rectangle Animation Background */}
       <RectangleAnimation show={showRectangles} />
 
+      {/* Hours Played Scene */}
+      {showHours && currentScene === "hours" && <HoursPlayedScene hours={hoursPlayed} />}
+
       {/* Top Champions Scene */}
       {showStats && <TopChampionsScene champions={topChampions} />}
 
@@ -325,8 +455,11 @@ export default function ChronobreakPage() {
         />
       )}
 
-      {/* Top Roles Scene */}
+      {/* Top Roles Scene (Top 5) */}
       {showRoles && currentScene === "roles" && <TopRolesScene roles={topRoles} />}
+
+      {/* Top 2 Roles Scene */}
+      {showTop2Roles && currentScene === "top2roles" && <Top2RolesScene roles={top2Roles} />}
 
       {/* Summary Scene */}
       {currentScene === "summary" && (
