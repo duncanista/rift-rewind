@@ -241,30 +241,30 @@ export default function ChronobreakPage() {
         console.log(`Fetching data for summoner: ${summonerName}`);
         
         const response = await fetch(LAMBDA_FUNCTION_URL, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            summoner: summonerName
+            summoner: summonerName,
           }),
         });
 
         if (response.status === 200) {
           const result = await response.json();
-          console.log('Data fetched successfully:', result);
+          console.log("Data fetched successfully:", result);
           setAggregatedData(result);
           setIsLoading(false);
         } else {
           const errorData = await response.json();
-          console.error('Failed to fetch data:', errorData);
-          setError(errorData.error || 'Failed to fetch match data');
+          console.error("Failed to fetch data:", errorData);
+          setError(errorData.error || "Failed to fetch match data");
           setIsLoading(false);
           // Fallback to mock data
         }
       } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Network error occurred');
+        console.error("Error fetching data:", err);
+        setError("Network error occurred");
         setIsLoading(false);
         // Fallback to mock data
       }
