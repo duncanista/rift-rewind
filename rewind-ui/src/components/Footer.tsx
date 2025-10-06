@@ -38,7 +38,17 @@ export default function Footer() {
               </div>
               <div className="flex flex-col gap-3">
                 <a
-                  href="#"
+                  href="https://builder.aws.com/content/2cL6U7m5JvOIgYbGtzZT7E0NBR0/rift-rewind-ready-for-a-chronobreak"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-base font-medium text-white/60 hover:text-white/90 transition-colors"
+                >
+                  Blog
+                </a>
+                <a
+                  href="https://builder.aws.com/content/2cL6U7m5JvOIgYbGtzZT7E0NBR0/rift-rewind-ready-for-a-chronobreak"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-base font-medium text-white/60 hover:text-white/90 transition-colors"
                 >
                   Challenge 1
@@ -72,7 +82,18 @@ export default function Footer() {
               </a>
 
               <a
-                href="#"
+                href="https://builder.aws.com/content/2cL6U7m5JvOIgYbGtzZT7E0NBR0/rift-rewind-ready-for-a-chronobreak"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-white/60 hover:text-white/90 transition-colors"
+              >
+                Blog
+              </a>
+
+              <a
+                href="https://builder.aws.com/content/2cL6U7m5JvOIgYbGtzZT7E0NBR0/rift-rewind-ready-for-a-chronobreak"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-sm font-medium text-white/60 hover:text-white/90 transition-colors"
               >
                 Challenge 1
