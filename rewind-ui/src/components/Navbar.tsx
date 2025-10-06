@@ -40,12 +40,12 @@ export default function Navbar() {
 
         {/* Center Navigation - Desktop Only */}
         <div className="flex-1 hidden md:flex justify-center items-center space-x-8">
-          <Link 
+          {/* <Link 
             href="/features" 
             className="text-white/70 hover:text-white text-lg font-semibold transition-colors"
           >
             FEATURES
-          </Link>
+          </Link> */}
           <a 
             href="https://lolesports.com/" 
             target="_blank"
@@ -127,13 +127,13 @@ export default function Navbar() {
           isMenuOpen ? "translate-y-0" : "-translate-y-4"
         }`}>
           {/* Navigation Links */}
-          <Link 
+          {/* <Link 
             href="/features" 
             className="text-white/70 hover:text-white text-xl font-semibold transition-colors"
             onClick={() => setIsMenuOpen(false)}
           >
             FEATURES
-          </Link>
+          </Link> */}
           <a 
             href="https://lolesports.com/" 
             target="_blank"

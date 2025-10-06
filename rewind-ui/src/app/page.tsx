@@ -31,9 +31,9 @@ export default function Home() {
       return;
     }
 
-    // Generate a unique ID
-    const uid = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    setPendingUid(uid);
+    // Use the Riot ID as the identifier (encode for URL safety)
+    const encodedRiotId = encodeURIComponent(riotId);
+    setPendingUid(encodedRiotId);
     
     // Start fade to black animation
     setIsFading(true);
