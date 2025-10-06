@@ -16,9 +16,50 @@ import {
   StoryProgressBar, 
 } from "@/components/chronobreak";
 
-// Mock aggregated data from backend
-// TODO: Replace with actual API call when backend is connected
-const MOCK_AGGREGATED_DATA = {
+// Lambda Function URL
+const LAMBDA_FUNCTION_URL = "https://4yry7prgvpiu6gralibuy5aepa0czkqp.lambda-url.us-east-1.on.aws/";
+
+// Type for aggregated data from backend
+interface AggregatedData {
+  pings: {
+    allInPings: number;
+    assistMePings: number;
+    basicPings: number;
+    commandPings: number;
+    dangerPings: number;
+    enemyMissingPings: number;
+    enemyVisionPings: number;
+    getBackPings: number;
+    holdPings: number;
+    needVisionPings: number;
+    onMyWayPings: number;
+    pushPings: number;
+    visionClearedPings: number;
+  };
+  kills: number;
+  deaths: number;
+  assists: number;
+  cs: number;
+  vision_score: number;
+  wards_placed: number;
+  wards_killed: number;
+  early_surrender: number;
+  first_blood: number;
+  match_duration: number;
+  won: number;
+  lost: number;
+  champions: Record<string, number>;
+  positions: {
+    TOP: number;
+    JUNGLE: number;
+    MIDDLE: number;
+    BOTTOM: number;
+    UTILITY: number;
+  };
+}
+
+// Mock aggregated data from backend (fallback)
+const MOCK_AGGREGATED_DATA: AggregatedData = {
   pings: {
     allInPings: 2,
     assistMePings: 41,
@@ -96,6 +137,11 @@ export default function ChronobreakPage() {
   const hasTransition = searchParams.get("transition") === "true";
   const [showTransition, setShowTransition] = useState(hasTransition);
   
+  // Data fetching state
+  const [aggregatedData, setAggregatedData] = useState<AggregatedData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
   // Animation state management
   const [currentScene, setCurrentScene] = useState<AnimationScene>("idle");
   const [isAnimating, setIsAnimating] = useState(false);
@@ -114,16 +160,17 @@ export default function ChronobreakPage() {
   const totalStories = 5; // 1 hours played + 1 top champions scene + 1 top 2 roles scene + 1 top 5 roles scene + 1 summary scene
   const storyDuration = 10000; // 10 seconds per story
   
+  // Use fetched data or fallback to mock data
+  const dataToUse = aggregatedData || MOCK_AGGREGATED_DATA;
+  
   // Transform aggregated data for components
-  const totalGames = MOCK_AGGREGATED_DATA.won + MOCK_AGGREGATED_DATA.lost;
+  const totalGames = dataToUse.won + dataToUse.lost;
   
   // Calculate hours played (match_duration is in seconds, convert to hours and round up)
-  const hoursPlayed = Math.ceil(MOCK_AGGREGATED_DATA.match_duration / 3600);
+  const hoursPlayed = Math.ceil(dataToUse.match_duration / 3600);
   
   // Top 5 Champions - sorted by games played
-  // TODO: Update icon paths with real champion splash art URLs from backend
-  // TODO: Update "In your last X games" text dynamically based on actual game count
-  const topChampions = Object.entries(MOCK_AGGREGATED_DATA.champions)
+  const topChampions = Object.entries(dataToUse.champions)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5)
     .map(([name, games]) => ({
@@ -136,8 +183,7 @@ export default function ChronobreakPage() {
     }));
 
   // Top 5 Roles with percentages
-  // TODO: Calculate percentages based on dynamic total games instead of hardcoded 10
-  const topRoles = Object.entries(MOCK_AGGREGATED_DATA.positions)
+  const topRoles = Object.entries(dataToUse.positions)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5)
     .filter(([, games]) => games > 0)
@@ -152,24 +198,24 @@ export default function ChronobreakPage() {
   const top2Roles = topRoles.slice(0, 2);
 
   // Summary Stats
-  const kdaRatio = MOCK_AGGREGATED_DATA.deaths > 0 
-    ? ((MOCK_AGGREGATED_DATA.kills + MOCK_AGGREGATED_DATA.assists) / MOCK_AGGREGATED_DATA.deaths).toFixed(2)
-    : ((MOCK_AGGREGATED_DATA.kills + MOCK_AGGREGATED_DATA.assists)).toFixed(2);
+  const kdaRatio = dataToUse.deaths > 0 
+    ? ((dataToUse.kills + dataToUse.assists) / dataToUse.deaths).toFixed(2)
+    : ((dataToUse.kills + dataToUse.assists)).toFixed(2);
   
-  const uniqueChampionsCount = Object.keys(MOCK_AGGREGATED_DATA.champions).length;
-  const surrenderPercentage = (MOCK_AGGREGATED_DATA.early_surrender / totalGames) * 100;
+  const uniqueChampionsCount = Object.keys(dataToUse.champions).length;
+  const surrenderPercentage = (dataToUse.early_surrender / totalGames) * 100;
   
   const summaryStats = {
     kda: { 
-      kills: MOCK_AGGREGATED_DATA.kills, 
-      deaths: MOCK_AGGREGATED_DATA.deaths, 
-      assists: MOCK_AGGREGATED_DATA.assists, 
+      kills: dataToUse.kills, 
+      deaths: dataToUse.deaths, 
+      assists: dataToUse.assists, 
     },
     kdaRatio,
     championsPlayed: uniqueChampionsCount,
-    totalDeaths: MOCK_AGGREGATED_DATA.deaths,
+    totalDeaths: dataToUse.deaths,
     topRoles: top2Roles,
-    ffCount: MOCK_AGGREGATED_DATA.early_surrender,
+    ffCount: dataToUse.early_surrender,
     ffText: surrenderPercentage < 5 ? "you never gave up!" : "times you said \"gg go next\"",
   };
 
@@ -179,6 +225,53 @@ export default function ChronobreakPage() {
       router.push("/");
     }
   }, [uid, router]);
+
+  // Fetch aggregated data from Lambda as soon as possible
+  useEffect(() => {
+    if (!uid || uid.trim() === "") return;
+
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        // Decode the uid to get the summoner name (e.g., "GameName#TAG")
+        const summonerName = decodeURIComponent(uid);
+        
+        console.log(`Fetching data for summoner: ${summonerName}`);
+        
+        const response = await fetch(LAMBDA_FUNCTION_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            summoner: summonerName
+          }),
+        });
+
+        if (response.status === 200) {
+          const result = await response.json();
+          console.log('Data fetched successfully:', result);
+          setAggregatedData(result);
+          setIsLoading(false);
+        } else {
+          const errorData = await response.json();
+          console.error('Failed to fetch data:', errorData);
+          setError(errorData.error || 'Failed to fetch match data');
+          setIsLoading(false);
+          // Fallback to mock data
+        }
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Network error occurred');
+        setIsLoading(false);
+        // Fallback to mock data
+      }
+    };
+
+    fetchData();
+  }, [uid]);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -314,28 +407,23 @@ export default function ChronobreakPage() {
     }
   };
 
-  // Animation sequence controller
+  // Animation sequence controller - auto-advance to next scene after duration
   useEffect(() => {
     if (!isAnimating) return;
 
-    if (currentScene === "scene1") {
-      // Scene 1 lasts 10 seconds total
+    // Auto-advance all scenes except the last one (summary)
+    if (currentScene !== "idle" && currentStoryIndex < totalStories - 1) {
       const timer = setTimeout(() => {
         goToNextStory();
       }, storyDuration);
 
       return () => clearTimeout(timer);
     }
-
-    // Future scenes will be handled here
-    // Example:
-    // if (currentScene === 'scene2') {
-    //   const timer = setTimeout(() => {
-    //     setCurrentScene('scene3');
-    //   }, SCENE2_DURATION);
-    //   return () => clearTimeout(timer);
-    // }
-  }, [currentScene, isAnimating, currentStoryIndex]);
+    
+    // For the summary scene (last one), don't auto-advance
+    // User can manually close or stay on it
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentScene, isAnimating, currentStoryIndex, storyDuration]);
 
   // Progress bar animation
   useEffect(() => {
@@ -419,14 +507,27 @@ export default function ChronobreakPage() {
             </div>
           </h1>
           <p className="text-gray-400 text-base sm:text-lg md:text-xl mb-6 md:mb-8 px-4">
-            Analyzing your Rift journey...
+            {isLoading ? "Fetching your match data..." : error ? "Using sample data..." : "Your data is ready!"}
           </p>
           
           <button
             onClick={handleButtonClick}
-            className="bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white font-bold py-4 px-8 rounded-xl text-lg md:text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-sky-500/50"
+            disabled={isLoading}
+            className={`font-bold py-4 px-8 rounded-xl text-lg md:text-xl transition-all duration-300 shadow-lg ${
+              isLoading 
+                ? "bg-gray-500 cursor-not-allowed opacity-50" 
+                : "bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 transform hover:scale-105 hover:shadow-sky-500/50"
+            } text-white`}
           >
-            View Your Rewind
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Loading...
+              </span>
+            ) : "View Your Rewind"}
           </button>
         </div>
       </main>
