@@ -1,16 +1,47 @@
 '''
-This lambda will trigger after fetch_matches lambda.
-It will run once per match ID and send the match data to a SQS queue for another lambda to process.
+This lambda will be triggered by a Step Function. 
+It receives a single match ID and returns the match data.
 '''
 
-import boto3
 import json
-from typing import List, Dict, Any
+from typing import Dict, Any
+from common.fetch_api import RiotAPIClient, MatchAnalyzer
+import os
 
-# def main() -> None:
-    # sqs = boto3.client("sqs")
-    # queue_url = "https://sqs.us-east-1.amazonaws.com/123456789012/match-data-queue"
-    # messages = sqs.receive_message(QueueUrl=queue_url, MaxNumberOfMessages=10)
-    # for message in messages["Messages"]:
-    #     match_id = message["Body"]
-    #     match_data = get_match_data(match_id)
+DEV_API_KEY = os.environ["DEV_API_KEY"]
+
+def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
+    if len(event['Records']) != 1:
+        return {
+            'statusCode': 400,
+            'body': json.dumps({'message': 'Expected 1 record, got ' + str(len(event['Records']))})
+        }
+
+    try:
+        message = json.loads(event['Records'][0]['body'])
+        match_id = message['match_id']
+        puuid = message['puuid']
+
+    except Exception as e:
+        return {
+            'statusCode': 400,
+            'body': json.dumps({'message': 'Record not formatted correctly: ' + str(e)})
+        }
+
+    client = RiotAPIClient(DEV_API_KEY)
+    try:
+        match_data = client.get_match(match_id)
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'message': 'Failed to get match data: ' + str(e)})
+        }
+
+    match_analyzer = MatchAnalyzer(puuid, match_data)
+    match_data = match_analyzer.get_match_data()
+
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps({'message': 'Match data processed', 'match_data': match_data})
+    }
