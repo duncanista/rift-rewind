@@ -21,11 +21,11 @@ export default function RectangleAnimation({ show }: RectangleAnimationProps) {
               key={`top-${index}`}
               className="flex-1 animate-slideDownToMiddle"
               style={{
-                background: 'linear-gradient(to bottom, #1E40AF 0%, #1E3A8A 20%, #1E293B 40%, #0F172A 60%, #020617 80%, #000000 100%)',
+                background: "linear-gradient(to bottom, #1E40AF 0%, #1E3A8A 20%, #1E293B 40%, #0F172A 60%, #020617 80%, #000000 100%)",
                 animationDelay: `${delay}ms`,
-                animationDuration: '1500ms',
-                animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
-                animationFillMode: 'forwards',
+                animationDuration: "1500ms",
+                animationTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
+                animationFillMode: "forwards",
               }}
             />
           );
@@ -44,11 +44,11 @@ export default function RectangleAnimation({ show }: RectangleAnimationProps) {
               key={`bottom-${index}`}
               className="flex-1 animate-slideUpToMiddle"
               style={{
-                background: 'linear-gradient(to top, #1E40AF 0%, #1E3A8A 20%, #1E293B 40%, #0F172A 60%, #020617 80%, #000000 100%)',
+                background: "linear-gradient(to top, #1E40AF 0%, #1E3A8A 20%, #1E293B 40%, #0F172A 60%, #020617 80%, #000000 100%)",
                 animationDelay: `${delay}ms`,
-                animationDuration: '1500ms',
-                animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
-                animationFillMode: 'forwards',
+                animationDuration: "1500ms",
+                animationTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
+                animationFillMode: "forwards",
               }}
             />
           );

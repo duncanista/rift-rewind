@@ -1,8 +1,7 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { Share2 } from 'lucide-react';
+import Image from "next/image";
+import Link from "next/link";
 
 interface SummaryStats {
   kda: { kills: number; deaths: number; assists: number };
@@ -27,7 +26,7 @@ export default function SummaryScene({ stats, uid, onShareToTwitter }: SummarySc
         {/* Summary Title */}
         <h2 
           className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6"
-          style={{ fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)' }}
+          style={{ fontFamily: "var(--font-zalando-sans, \"Zalando Sans Expanded\", sans-serif)" }}
         >
           YOUR 2024 RIFT REWIND
         </h2>
