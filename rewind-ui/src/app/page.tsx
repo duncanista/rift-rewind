@@ -51,12 +51,12 @@ export default function Home() {
       video.play().catch((error) => {
         console.error("Error playing video:", error);
         // If video fails to play, redirect immediately
-        router.push(`/chronobreak/${pendingUid}`);
+        router.push(`/chronobreak/${pendingUid}?region=${region}`);
       });
       
       // Wait for video to end, then redirect with transition flag
       const handleEnded = () => {
-        router.push(`/chronobreak/${pendingUid}?transition=true`);
+        router.push(`/chronobreak/${pendingUid}?transition=true&region=${region}`);
       };
       
       video.addEventListener("ended", handleEnded);
@@ -65,7 +65,7 @@ export default function Home() {
         video.removeEventListener("ended", handleEnded);
       };
     }
-  }, [isPlaying, pendingUid, router]);
+  }, [isPlaying, pendingUid, region, router]);
 
   return (
     <div className="flex flex-col h-screen">
