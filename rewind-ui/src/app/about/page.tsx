@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { siGithub, siX, siInstagram } from 'simple-icons';
-import SimpleIcon from '@/components/SimpleIcon';
-import { Hammer } from 'lucide-react';
-import Navbar from '@/components/Navbar';
-import BlobBackground from '@/components/BlobBackground';
-import Footer from '@/components/Footer';
-import Image from 'next/image';
+import React from "react";
+import { siGithub, siX, siInstagram } from "simple-icons";
+import SimpleIcon from "@/components/SimpleIcon";
+import { Hammer } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import BlobBackground from "@/components/BlobBackground";
+import Footer from "@/components/Footer";
+import Image from "next/image";
 
 // Splash Art Gradient Configuration
 const SPLASH_CONFIG = {
@@ -52,49 +52,49 @@ interface Developer {
 
 const developers: Developer[] = [
   {
-    name: 'Jordan González',
-    title: 'Software Engineer',
-    company: 'Datadog',
-    ign: 'Duncanista#LAN',
-    rank: 'Emerald',
-    rankImage: '/images/ranks/emerald.png',
-    positions: ['sup', 'mid'],
-    image: 'https://via.placeholder.com/400x400',
-    championSplash: '/images/champions/lux-splashart.webp',
+    name: "Jordan González",
+    title: "Software Engineer",
+    company: "Datadog",
+    ign: "Duncanista#LAN",
+    rank: "Emerald",
+    rankImage: "/images/ranks/emerald.png",
+    positions: ["sup", "mid"],
+    image: "https://via.placeholder.com/400x400",
+    championSplash: "/images/champions/lux-splashart.webp",
     socials: {
-      twitter: 'https://x.com/jordan_nebula',
-      instagram: 'https://instagram.com/jordangonzalez.dev',
-      github: 'https://github.com/duncanista',
-      aws: 'https://builder.aws.com/community/@jordangonzalez',
+      twitter: "https://x.com/jordan_nebula",
+      instagram: "https://instagram.com/jordangonzalez.dev",
+      github: "https://github.com/duncanista",
+      aws: "https://builder.aws.com/community/@jordangonzalez",
     },
   },
   {
-    name: 'Joaquín Ríos',
-    title: 'Software Engineer',
-    company: 'Datadog',
-    ign: 'Blackstar#288',
-    rank: 'Emerald',
-    rankImage: '/images/ranks/emerald.png',
-    positions: ['jgl', 'top'],
-    image: 'https://via.placeholder.com/400x400',
-    championSplash: '/images/champions/udyr-splashart.webp',
+    name: "Joaquín Ríos",
+    title: "Software Engineer",
+    company: "Datadog",
+    ign: "Blackstar#288",
+    rank: "Emerald",
+    rankImage: "/images/ranks/emerald.png",
+    positions: ["jgl", "top"],
+    image: "https://via.placeholder.com/400x400",
+    championSplash: "/images/champions/udyr-splashart.webp",
     socials: {
-      github: 'https://github.com/joaquinrios',
+      github: "https://github.com/joaquinrios",
     },
   },
   {
-    name: 'Uri Elías',
-    title: 'Software Engineer',
-    company: 'Pinterest',
-    ign: 'Stardust#SPC',
-    rank: 'Master',
-    rankImage: '/images/ranks/master.png',
-    positions: ['mid', 'top'],
-    image: 'https://via.placeholder.com/400x400',
-    championSplash: '/images/champions/katarina-splashart.webp',
+    name: "Uri Elías",
+    title: "Software Engineer",
+    company: "Pinterest",
+    ign: "Stardust#SPC",
+    rank: "Master",
+    rankImage: "/images/ranks/master.png",
+    positions: ["mid", "top"],
+    image: "https://via.placeholder.com/400x400",
+    championSplash: "/images/champions/katarina-splashart.webp",
     socials: {
-      instagram: 'https://instagram.com/stardustspc',
-      github: 'https://github.com/urielias',
+      instagram: "https://instagram.com/stardustspc",
+      github: "https://github.com/urielias",
     },
   },
 ];
@@ -110,7 +110,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <BlobBackground
-        colors={['#8B5CF6', '#EC4899', '#1E40AF']}
+        colors={["#8B5CF6", "#EC4899", "#1E40AF"]}
         blobCount={3}
         minSizePercent={35}
         maxSizePercent={50}
@@ -127,7 +127,7 @@ export default function AboutPage() {
             <div className="text-center space-y-6">
               <h1
                 className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-bold text-white leading-tight"
-                style={{ fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)' }}
+                style={{ fontFamily: "var(--font-zalando-sans, \"Zalando Sans Expanded\", sans-serif)" }}
               >
                 RIFT REWIND
               </h1>
@@ -148,7 +148,7 @@ export default function AboutPage() {
                 it&apos;s like to live and breathe this game.
               </p>
               <p>
-                <span className="text-white font-semibold">Rift Rewind</span> was born from the{' '}
+                <span className="text-white font-semibold">Rift Rewind</span> was born from the{" "}
                 <a
                   href="https://riftrewind.devpost.com/"
                   target="_blank"
@@ -216,7 +216,7 @@ export default function AboutPage() {
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                   style={{
                     backgroundImage: `url(${dev.championSplash})`,
-                    filter: 'blur(0px)',
+                    filter: "blur(0px)",
                   }}
                 />
                 {/* Organic Edge Fade Mask - Creates dissolving edges */}
@@ -265,8 +265,8 @@ export default function AboutPage() {
                     <h2
                       className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-bold text-white leading-none mb-4"
                       style={{
-                        fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)',
-                        textShadow: '0 4px 20px rgba(0,0,0,0.8)',
+                        fontFamily: "var(--font-zalando-sans, \"Zalando Sans Expanded\", sans-serif)",
+                        textShadow: "0 4px 20px rgba(0,0,0,0.8)",
                       }}
                     >
                       {dev.name}
@@ -289,7 +289,7 @@ export default function AboutPage() {
                           </p>
                           <p
                             className="text-base sm:text-lg md:text-2xl lg:text-3xl text-white font-bold"
-                            style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}
+                            style={{ textShadow: "0 2px 10px rgba(0,0,0,0.8)" }}
                           >
                             {dev.title}
                           </p>
@@ -299,7 +299,7 @@ export default function AboutPage() {
                           <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">At</p>
                           <p
                             className="text-sm sm:text-base md:text-lg lg:text-xl text-white/70 font-medium"
-                            style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}
+                            style={{ textShadow: "0 2px 10px rgba(0,0,0,0.8)" }}
                           >
                             {dev.company}
                           </p>
@@ -397,7 +397,7 @@ export default function AboutPage() {
                           </p>
                           <p
                             className="text-base sm:text-lg md:text-2xl lg:text-3xl text-white font-bold"
-                            style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}
+                            style={{ textShadow: "0 2px 10px rgba(0,0,0,0.8)" }}
                           >
                             {dev.ign}
                           </p>
@@ -417,7 +417,7 @@ export default function AboutPage() {
                             />
                             <p
                               className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-bold"
-                              style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}
+                              style={{ textShadow: "0 2px 10px rgba(0,0,0,0.8)" }}
                             >
                               {dev.rank}
                             </p>

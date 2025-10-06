@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 interface SimpleIconProps {
   path: string;
@@ -8,7 +8,7 @@ interface SimpleIconProps {
   className?: string;
 }
 
-export default function SimpleIcon({ path, title, className = 'w-6 h-6' }: SimpleIconProps) {
+export default function SimpleIcon({ path, title, className = "w-6 h-6" }: SimpleIconProps) {
   return (
     <svg
       role="img"
