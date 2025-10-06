@@ -1,21 +1,21 @@
 "use client";
 
-import { useParams, useSearchParams, useRouter } from 'next/navigation';
-import { useEffect, useState, useRef } from 'react';
-import Navbar from '@/components/Navbar';
-import BlobBackground from '@/components/BlobBackground';
-import Footer from '@/components/Footer';
+import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
+import Navbar from "@/components/Navbar";
+import BlobBackground from "@/components/BlobBackground";
+import Footer from "@/components/Footer";
 import { 
   TopChampionsScene, 
   TopRolesScene, 
   SummaryScene, 
   RectangleAnimation, 
   FloatingLogo, 
-  StoryProgressBar 
-} from '@/components/chronobreak';
+  StoryProgressBar, 
+} from "@/components/chronobreak";
 
 // Animation scene configuration
-type AnimationScene = 'idle' | 'scene1' | 'roles' | 'summary';
+type AnimationScene = "idle" | "scene1" | "roles" | "summary";
 
 export default function ChronobreakPage() {
   const params = useParams();
@@ -26,7 +26,7 @@ export default function ChronobreakPage() {
   const [showTransition, setShowTransition] = useState(hasTransition);
   
   // Animation state management
-  const [currentScene, setCurrentScene] = useState<AnimationScene>('idle');
+  const [currentScene, setCurrentScene] = useState<AnimationScene>("idle");
   const [isAnimating, setIsAnimating] = useState(false);
   const [showRectangles, setShowRectangles] = useState(false);
   const [showStats, setShowStats] = useState(false);
@@ -43,39 +43,39 @@ export default function ChronobreakPage() {
   
   // TODO: Replace with real data from API
   const topChampions = [
-    { name: 'Katarina', games: 15, icon: '/images/champions/katarina-splashart.webp' },
-    { name: 'Lux', games: 12, icon: '/images/champions/lux-splashart.webp' },
-    { name: 'Udyr', games: 10, icon: '/images/champions/udyr-splashart.webp' },
-    { name: 'Yasuo', games: 8, icon: '/images/champions/katarina-splashart.webp' },
-    { name: 'Zed', games: 7, icon: '/images/champions/lux-splashart.webp' },
+    { name: "Katarina", games: 15, icon: "/images/champions/katarina-splashart.webp" },
+    { name: "Lux", games: 12, icon: "/images/champions/lux-splashart.webp" },
+    { name: "Udyr", games: 10, icon: "/images/champions/udyr-splashart.webp" },
+    { name: "Yasuo", games: 8, icon: "/images/champions/katarina-splashart.webp" },
+    { name: "Zed", games: 7, icon: "/images/champions/lux-splashart.webp" },
   ];
 
   // TODO: Replace with real data from API
   const summaryStats = {
     kda: { kills: 156, deaths: 142, assists: 312 },
-    kdaRatio: '3.29',
+    kdaRatio: "3.29",
     championsPlayed: 23,
     totalDeaths: 142,
     topRoles: [
-      { name: 'Top', icon: '/images/position/top.svg' },
-      { name: 'Support', icon: '/images/position/sup.svg' }
+      { name: "Top", icon: "/images/position/top.svg" },
+      { name: "Support", icon: "/images/position/sup.svg" },
     ],
     ffCount: 12,
   };
 
   // TODO: Replace with real data from API
   const topRoles = [
-    { name: 'Top', games: 45, percentage: 32, icon: '/images/position/top.svg' },
-    { name: 'Support', games: 38, percentage: 27, icon: '/images/position/sup.svg' },
-    { name: 'Mid', games: 28, percentage: 20, icon: '/images/position/mid.svg' },
-    { name: 'ADC', games: 15, percentage: 11, icon: '/images/position/adc.svg' },
-    { name: 'Jungle', games: 12, percentage: 10, icon: '/images/position/jgl.svg' },
+    { name: "Top", games: 45, percentage: 32, icon: "/images/position/top.svg" },
+    { name: "Support", games: 38, percentage: 27, icon: "/images/position/sup.svg" },
+    { name: "Mid", games: 28, percentage: 20, icon: "/images/position/mid.svg" },
+    { name: "ADC", games: 15, percentage: 11, icon: "/images/position/adc.svg" },
+    { name: "Jungle", games: 12, percentage: 10, icon: "/images/position/jgl.svg" },
   ];
 
   // Redirect to home if no uid is provided
   useEffect(() => {
-    if (!uid || uid.trim() === '') {
-      router.push('/');
+    if (!uid || uid.trim() === "") {
+      router.push("/");
     }
   }, [uid, router]);
 
@@ -114,7 +114,7 @@ export default function ChronobreakPage() {
     
     // Check if this is the summary scene (last story)
     if (index === totalStories - 1) {
-      setCurrentScene('summary');
+      setCurrentScene("summary");
       // Use setTimeout to ensure state is cleared first
       const timeout = setTimeout(() => {
         setShowRectangles(true);
@@ -123,7 +123,7 @@ export default function ChronobreakPage() {
     } 
     // Check if this is the roles scene (second to last story)
     else if (index === totalStories - 2) {
-      setCurrentScene('roles');
+      setCurrentScene("roles");
       // Use setTimeout to ensure state is cleared first
       const timeout = setTimeout(() => {
         setShowRectangles(true);
@@ -132,7 +132,7 @@ export default function ChronobreakPage() {
       timeoutRefs.current.push(timeout);
     } 
     else {
-      setCurrentScene('scene1');
+      setCurrentScene("scene1");
       
       // Wait 700ms for content to fade out, then show rectangles
       const timeout1 = setTimeout(() => {
@@ -157,12 +157,12 @@ export default function ChronobreakPage() {
       startStory(currentStoryIndex + 1);
     } else {
       // All stories completed
-      console.log('All stories completed');
+      console.log("All stories completed");
       setIsAnimating(false);
       setShowRectangles(false);
       setShowStats(false);
       setShowRoles(false);
-      setCurrentScene('idle');
+      setCurrentScene("idle");
     }
   };
 
@@ -174,13 +174,13 @@ export default function ChronobreakPage() {
 
   const handleShareToTwitter = () => {
     const rewindUrl = `https://riftrewind.lol/chronobreak/${uid}`;
-    const tweetText = `Check out my League of Legends Rift Rewind! 🎮✨`;
+    const tweetText = "Check out my League of Legends Rift Rewind! 🎮✨";
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(rewindUrl)}`;
-    window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+    window.open(twitterUrl, "_blank", "noopener,noreferrer");
   };
 
-  const handleStoryTap = (side: 'left' | 'right') => {
-    if (side === 'left') {
+  const handleStoryTap = (side: "left" | "right") => {
+    if (side === "left") {
       goToPreviousStory();
     } else {
       goToNextStory();
@@ -191,7 +191,7 @@ export default function ChronobreakPage() {
   useEffect(() => {
     if (!isAnimating) return;
 
-    if (currentScene === 'scene1') {
+    if (currentScene === "scene1") {
       // Scene 1 lasts 10 seconds total
       const timer = setTimeout(() => {
         goToNextStory();
@@ -242,27 +242,27 @@ export default function ChronobreakPage() {
           <div
             onClick={(e) => {
               e.stopPropagation();
-              handleStoryTap('left');
+              handleStoryTap("left");
             }}
             className="fixed left-0 top-0 bottom-0 w-1/4 z-[9999] cursor-pointer"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
+            style={{ WebkitTapHighlightColor: "transparent" }}
           />
           {/* Right tap area - go forward (1/4 of screen) */}
           <div
             onClick={(e) => {
               e.stopPropagation();
-              handleStoryTap('right');
+              handleStoryTap("right");
             }}
             className="fixed right-0 top-0 bottom-0 w-1/4 z-[9999] cursor-pointer"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
+            style={{ WebkitTapHighlightColor: "transparent" }}
           />
         </>
       )}
 
       {/* BlobBackground - fade out during animation */}
-      <div className={`transition-opacity duration-700 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
+      <div className={`transition-opacity duration-700 ${isAnimating ? "opacity-0" : "opacity-100"}`}>
         <BlobBackground 
-          colors={['#4A90E2', '#5CA9E8', '#87CEEB']}
+          colors={["#4A90E2", "#5CA9E8", "#87CEEB"]}
           blobCount={3}
           minSizePercent={35}
           maxSizePercent={50}
@@ -271,14 +271,14 @@ export default function ChronobreakPage() {
       </div>
       
       {/* Navbar - fade out during animation */}
-      <div className={`transition-opacity duration-700 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
+      <div className={`transition-opacity duration-700 ${isAnimating ? "opacity-0" : "opacity-100"}`}>
         <Navbar />
       </div>
       
       {/* Floating Logo during animation */}
       <FloatingLogo show={showRectangles} />
       
-      <main className={`flex-1 flex items-center justify-center px-4 py-12 overflow-hidden transition-opacity duration-700 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
+      <main className={`flex-1 flex items-center justify-center px-4 py-12 overflow-hidden transition-opacity duration-700 ${isAnimating ? "opacity-0" : "opacity-100"}`}>
         <div className="w-full max-w-4xl text-center px-2">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium mb-4 md:mb-6">
             <div className="break-words">
@@ -305,7 +305,7 @@ export default function ChronobreakPage() {
       </main>
       
       {/* Footer - fade out during animation */}
-      <div className={`transition-opacity duration-700 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
+      <div className={`transition-opacity duration-700 ${isAnimating ? "opacity-0" : "opacity-100"}`}>
         <Footer />
       </div>
 
@@ -326,10 +326,10 @@ export default function ChronobreakPage() {
       )}
 
       {/* Top Roles Scene */}
-      {showRoles && currentScene === 'roles' && <TopRolesScene roles={topRoles} />}
+      {showRoles && currentScene === "roles" && <TopRolesScene roles={topRoles} />}
 
       {/* Summary Scene */}
-      {currentScene === 'summary' && (
+      {currentScene === "summary" && (
         <SummaryScene 
           stats={summaryStats}
           uid={uid}

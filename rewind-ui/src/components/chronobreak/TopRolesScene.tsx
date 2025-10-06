@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
+import Image from "next/image";
 
 interface Role {
   name: string;
@@ -18,7 +18,7 @@ export default function TopRolesScene({ roles }: TopRolesSceneProps) {
     <div className="fixed inset-0 z-[9998] flex items-center justify-center pointer-events-none">
       <div className="w-full max-w-3xl px-4 animate-fadeIn pointer-events-auto">
         {/* Title */}
-        <h2 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 md:mb-12" style={{ fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)' }}>
+        <h2 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 md:mb-12" style={{ fontFamily: "var(--font-zalando-sans, \"Zalando Sans Expanded\", sans-serif)" }}>
           YOUR TOP ROLES
         </h2>
         <p className="text-gray-300 text-lg md:text-xl text-center mb-8 md:mb-12">
@@ -30,7 +30,7 @@ export default function TopRolesScene({ roles }: TopRolesSceneProps) {
           {roles.map((role, index) => {
             // Calculate size scale - first is largest, then decreases
             const sizeScale = index === 0 ? 1.0 : index === 1 ? 0.9 : index === 2 ? 0.8 : 0.7;
-            const maxWidth = index === 0 ? 'max-w-3xl' : index === 1 ? 'max-w-2xl' : index === 2 ? 'max-w-xl' : 'max-w-lg';
+            const maxWidth = index === 0 ? "max-w-3xl" : index === 1 ? "max-w-2xl" : index === 2 ? "max-w-xl" : "max-w-lg";
             
             return (
               <div

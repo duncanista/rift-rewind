@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { History } from 'lucide-react';
+import Link from "next/link";
+import { History } from "lucide-react";
 
 interface FloatingLogoProps {
   show: boolean;
@@ -16,7 +16,7 @@ export default function FloatingLogo({ show }: FloatingLogoProps) {
         <div className="relative w-6 h-6 md:w-8 md:h-8">
           <History className="w-6 h-6 md:w-8 md:h-8 text-white" />
         </div>
-        <span className="text-2xl md:text-4xl font-medium text-white" style={{ fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)' }}>
+        <span className="text-2xl md:text-4xl font-medium text-white" style={{ fontFamily: "var(--font-zalando-sans, \"Zalando Sans Expanded\", sans-serif)" }}>
           RIFT REWIND
         </span>
       </Link>
