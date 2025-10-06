@@ -67,7 +67,7 @@ export default function Home() {
   }, [isPlaying, pendingUid, router]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-screen">
       <BlobBackground 
         colors={blobColors}
         blobCount={3}
@@ -82,12 +82,12 @@ export default function Home() {
             <div className="text-white mb-1 md:mb-2">Ready for a</div>
             <div className="break-words">
               <span 
-                className="text-white text-4xl sm:text-5xl md:text-7xl font-bold leading-tight"
+                className="text-white text-3xl sm:text-5xl md:text-7xl font-bold leading-tight"
                 style={{ fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)' }}
               >
                 CHRONOBREAK
               </span>
-              <span className="text-white text-3xl sm:text-4xl md:text-6xl font-bold">?</span>
+              <span className="text-white text-2xl sm:text-4xl md:text-6xl font-bold">?</span>
             </div>
           </h1>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg px-4">
