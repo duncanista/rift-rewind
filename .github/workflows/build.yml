@@ -1,4 +1,4 @@
-name: rewind-ui lint
+name: rewind-ui build
 
 on:
   push:
@@ -13,5 +13,5 @@ jobs:
       - name: Install dependencies
         run: cd rewind-ui && yarn install
 
-      - name: Run linter
-        run: cd rewind-ui && yarn lint --fix
+      - name: Run build command
+        run: cd rewind-ui && yarn build
