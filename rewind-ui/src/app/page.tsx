@@ -1,13 +1,14 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import BlobBackground from "@/components/BlobBackground";
-import Footer from "@/components/Footer";
-import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { useState, FormEvent, useMemo, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import Navbar from '@/components/Navbar';
+import BlobBackground from '@/components/BlobBackground';
+import Footer from '@/components/Footer';
+import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { useState, FormEvent, useMemo, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function Home() {
   const router = useRouter();
@@ -76,8 +77,32 @@ export default function Home() {
         centerOffset={8}
       />
       <Navbar />
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 overflow-hidden">
-        <div className="text-center mb-6 md:mb-12 max-w-full">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 overflow-hidden relative">
+        {/* Heimerdinger Emote - Top Left */}
+        <div className="absolute pointer-events-none left-4 top-24 sm:left-8 sm:top-28 z-0 lg:left-[calc(50%_-_580px)] lg:top-1/2 lg:-translate-y-1/2 xl:left-[calc(50%_-_650px)]">
+          <Image
+            src="/images/emotes/heimerdinger-think.webp"
+            alt="Heimerdinger thinking"
+            width={300}
+            height={300}
+            className="w-32 h-32 sm:w-40 sm:h-40 opacity-60 lg:w-56 lg:h-56 lg:opacity-80 lg:hover:opacity-100 xl:w-64 xl:h-64 transition-opacity duration-300"
+            priority
+          />
+        </div>
+
+        {/* Zilean Emote - Bottom Right */}
+        <div className="absolute pointer-events-none right-4 bottom-8 sm:right-8 sm:bottom-12 z-0 lg:right-[calc(50%_-_580px)] lg:bottom-24 xl:right-[calc(50%_-_650px)] xl:bottom-28">
+          <Image
+            src="/images/emotes/zilean-giveit.png"
+            alt="Zilean emote"
+            width={300}
+            height={300}
+            className="w-32 h-36 sm:w-40 sm:h-44 opacity-60 lg:w-56 lg:h-64 lg:opacity-80 lg:hover:opacity-100 xl:w-64 xl:h-72 transition-opacity duration-300"
+            priority
+          />
+        </div>
+
+        <div className="text-center mb-6 md:mb-12 max-w-full relative z-10">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-medium mb-3 md:mb-4 px-2">
             <div className="text-white mb-1 md:mb-2">Ready for a</div>
             <div className="break-words">
@@ -95,7 +120,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="w-full max-w-2xl px-2">
+        <div className="w-full max-w-2xl px-2 relative z-10">
           <form 
             onSubmit={handleSubmit} 
             className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-6 md:p-10 shadow-2xl shadow-black/50 hover:shadow-purple-500/20 transition-all duration-300 hover:-translate-y-1"

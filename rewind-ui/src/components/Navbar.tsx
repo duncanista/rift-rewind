@@ -46,12 +46,14 @@ export default function Navbar() {
           >
             FEATURES
           </Link>
-          <Link 
+          <a 
             href="https://lolesports.com/" 
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-white/70 hover:text-white text-lg font-semibold transition-colors"
           >
             WORLDS25
-          </Link>
+          </a>
           <Link 
             href="/about" 
             className="text-white/70 hover:text-white text-lg font-semibold transition-colors"
@@ -132,13 +134,15 @@ export default function Navbar() {
           >
             FEATURES
           </Link>
-          <Link 
-            href="/games" 
+          <a 
+            href="https://lolesports.com/" 
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-white/70 hover:text-white text-xl font-semibold transition-colors"
             onClick={() => setIsMenuOpen(false)}
           >
             WORLDS25
-          </Link>
+          </a>
           <Link 
             href="/about" 
             className="text-white/70 hover:text-white text-xl font-semibold transition-colors"
