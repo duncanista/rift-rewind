@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,13 +13,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const zalandoSans = {
-  variable: "--font-zalando-sans",
-};
-
-const instrumentSans = {
+const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
-};
+  subsets: ["latin"],
+});
+
+// Zalando Sans Expanded is not available in next/font/google
+// Using a fallback or you can add it as a local font if you have the files
+const zalandoSans = localFont({
+  src: [],
+  variable: "--font-zalando-sans",
+  fallback: ["system-ui", "sans-serif"],
+});
 
 export const metadata: Metadata = {
   title: "Rift Rewind",
@@ -38,9 +44,6 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/favicon/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
         <link rel="manifest" href="/favicon/site.webmanifest" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Zalando+Sans+Expanded:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${zalandoSans.variable} ${instrumentSans.variable} antialiased`}>{children}</body>
     </html>
