@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { siGithub, siX, siInstagram } from 'simple-icons';
+import { siGithub, siX, siInstagram, } from 'simple-icons';
 import SimpleIcon from '@/components/SimpleIcon';
+import { Hammer} from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import BlobBackground from '@/components/BlobBackground';
 import Footer from '@/components/Footer';
@@ -45,6 +46,7 @@ interface Developer {
     twitter?: string;
     instagram?: string;
     github?: string;
+    aws?: string;
   };
 }
 
@@ -63,6 +65,7 @@ const developers: Developer[] = [
       twitter: 'https://x.com/jordan_nebula',
       instagram: 'https://instagram.com/jordangonzalez.dev',
       github: 'https://github.com/duncanista',
+      aws: 'https://builder.aws.com/community/@jordangonzalez',
     },
   },
   {
@@ -76,13 +79,11 @@ const developers: Developer[] = [
     image: 'https://via.placeholder.com/400x400',
     championSplash: '/images/champions/udyr-splashart.webp',
     socials: {
-      twitter: 'https://x.com/janesmith',
-      instagram: 'https://instagram.com/janesmith',
       github: 'https://github.com/joaquinrios',
     },
   },
   {
-    name: 'Uri Elias',
+    name: 'Uri Elías',
     title: 'Software Engineer',
     company: 'Pinterest',
     ign: 'Stardust',
@@ -92,8 +93,7 @@ const developers: Developer[] = [
     image: 'https://via.placeholder.com/400x400',
     championSplash: '/images/champions/katarina-splashart.webp',
     socials: {
-      twitter: 'https://x.com/alexjohnson',
-      instagram: 'https://instagram.com/alexjohnson',
+      instagram: 'https://instagram.com/stardustspc',
       github: 'https://github.com/urielias',
     },
   },
@@ -119,7 +119,7 @@ export default function AboutPage() {
       <Navbar />
       
       {/* Scroll Snap Container */}
-      <div className="snap-y snap-mandatory h-screen overflow-y-auto pt-20">
+      <div className="snap-y snap-mandatory h-screen overflow-y-auto pt-16 md:pt-20">
         
         {/* Intro Section */}
         <section className="snap-start h-screen shrink-0 flex items-center justify-center px-4 md:px-8 relative">
@@ -127,14 +127,14 @@ export default function AboutPage() {
             {/* Title */}
             <div className="text-center space-y-6">
               <h1 
-                className="text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-tight"
+                className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-bold text-white leading-tight"
                 style={{ fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)' }}
               >
                 RIFT REWIND
               </h1>
               <div className="flex items-center justify-center space-x-4">
                 <div className="h-px w-16 bg-gradient-to-r from-transparent to-purple-500"></div>
-                <p className="text-xl md:text-2xl text-purple-400 font-semibold uppercase tracking-wider">
+                <p className="text-base sm:text-lg md:text-2xl text-purple-400 font-semibold uppercase tracking-wider">
                   About the Project
                 </p>
                 <div className="h-px w-16 bg-gradient-to-l from-transparent to-purple-500"></div>
@@ -142,8 +142,8 @@ export default function AboutPage() {
             </div>
 
             {/* Content */}
-            <div className="space-y-6 text-white/90 text-lg md:text-xl leading-relaxed text-center max-w-6xl mx-auto mb-16">
-              <p className="md:text-3xl font-medium pb-4">
+            <div className="space-y-6 text-white/90 text-base sm:text-lg md:text-xl leading-relaxed text-center max-w-6xl mx-auto mb-16">
+              <p className="text-lg sm:text-xl md:text-3xl font-medium pb-4">
                 We&apos;re a team of passionate hackers, League of Legends players, and esports enthusiasts 
                 who&apos;ve experienced the thrill of Worlds firsthand — multiple times. We know what it&apos;s 
                 like to live and breathe this game.
@@ -166,7 +166,7 @@ export default function AboutPage() {
 
             {/* Scroll Indicator */}
             <div className="flex flex-col items-center space-y-3 absolute bottom-20 left-1/2 -translate-x-1/2 opacity-70 animate-bounce">
-              <p className="text-white/90 text-lg uppercase tracking-wider font-semibold">
+              <p className="text-white/90 text-sm sm:text-base md:text-lg uppercase tracking-wider font-semibold">
                 Meet the Team
               </p>
               <svg
@@ -242,8 +242,8 @@ export default function AboutPage() {
             </div>
 
             {/* Content */}
-            <div className="relative z-10 w-full max-w-none h-full flex items-center">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16 xl:gap-20 items-center w-full">
+            <div className="relative z-10 w-full max-w-none h-full flex items-center px-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 lg:gap-16 xl:gap-20 items-center w-full">
                 
                 {/* Left Side - Image (1/3 width) */}
                 <div className="flex items-center justify-center md:justify-end">
@@ -252,20 +252,20 @@ export default function AboutPage() {
                     <div className="absolute -inset-6 bg-gradient-to-r from-purple-600/30 via-pink-600/30 to-blue-600/30 rounded-full blur-3xl opacity-40 group-hover/img:opacity-60 transition duration-700"></div>
                     
                     {/* Image Container */}
-                    <div className="relative w-72 h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-4 border-white/30 shadow-2xl transform group-hover/img:scale-105 transition-transform duration-500">
+                    <div className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-4 border-white/30 shadow-2xl transform group-hover/img:scale-105 transition-transform duration-500">
                       <div className="w-full h-full bg-gradient-to-br from-purple-900/50 via-pink-900/50 to-blue-900/50 flex items-center justify-center">
-                        <span className="text-8xl text-white/30">👤</span>
+                        <span className="text-6xl sm:text-7xl md:text-8xl text-white/30">👤</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Right Side - Info (2/3 width) */}
-                <div className="md:col-span-2 flex flex-col justify-center space-y-8">
+                <div className="md:col-span-2 flex flex-col justify-center space-y-6 md:space-y-8">
                   {/* Name */}
                   <div>
                     <h2 
-                      className="text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-none mb-4"
+                      className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-bold text-white leading-none mb-4"
                       style={{ 
                         fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)',
                         textShadow: '0 4px 20px rgba(0,0,0,0.8)',
@@ -276,33 +276,33 @@ export default function AboutPage() {
                     <div className="h-1 w-24 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
                   </div>
 
-                  {/* Three Column Layout: IRL | In the Rift | Empty */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4 lg:gap-6">
+                  {/* Two Column Layout on Mobile, Three on Desktop: IRL | In the Rift */}
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-4 lg:gap-6">
                     {/* Left Column - IRL Info */}
-                    <div className="space-y-6">
-                      <h3 className="text-sm md:text-base text-purple-400 uppercase tracking-widest font-bold mb-4">
+                    <div className="space-y-4 md:space-y-6">
+                      <h3 className="text-xs sm:text-sm md:text-base text-purple-400 uppercase tracking-widest font-bold mb-2 md:mb-4">
                         IRL
                       </h3>
                       
-                      <div className="space-y-4">
+                      <div className="space-y-3 md:space-y-4">
                         <div className="space-y-1">
-                          <p className="text-xs text-white/50 uppercase tracking-wider">Title</p>
-                          <p className="text-2xl md:text-3xl text-white font-bold" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">Title</p>
+                          <p className="text-base sm:text-lg md:text-2xl lg:text-3xl text-white font-bold" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
                             {dev.title}
                           </p>
                         </div>
                         
                         <div className="space-y-1">
-                          <p className="text-xs text-white/50 uppercase tracking-wider">At</p>
-                          <p className="text-lg md:text-xl text-white/70 font-medium" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">At</p>
+                          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/70 font-medium" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
                             {dev.company}
                           </p>
                         </div>
 
                         {/* Social Links */}
                         <div className="pt-2">
-                          <p className="text-xs text-white/50 uppercase tracking-wider mb-3">Socials</p>
-                          <div className="flex items-center space-x-3">
+                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider mb-2 md:mb-3">Socials</p>
+                          <div className="flex items-center space-x-2 md:space-x-3">
                             {dev.socials.twitter && (
                               <a
                                 href={dev.socials.twitter}
@@ -312,8 +312,8 @@ export default function AboutPage() {
                                 aria-label="X (Twitter)"
                               >
                                 <div className="absolute inset-0 bg-purple-500/40 rounded-xl blur-xl opacity-0 group-hover/social:opacity-100 transition-opacity duration-300" />
-                                <div className="relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl bg-black/60 border-2 border-white/20 hover:bg-black/80 hover:border-purple-500/70 hover:scale-110 transition-all duration-300 backdrop-blur-sm">
-                                  <SimpleIcon path={siX.path} title="X" className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                                <div className="relative w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl bg-black/60 border-2 border-white/20 hover:bg-black/80 hover:border-purple-500/70 hover:scale-110 transition-all duration-300 backdrop-blur-sm">
+                                  <SimpleIcon path={siX.path} title="X" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
                                 </div>
                               </a>
                             )}
@@ -326,8 +326,8 @@ export default function AboutPage() {
                                 aria-label="Instagram"
                               >
                                 <div className="absolute inset-0 bg-pink-500/40 rounded-xl blur-xl opacity-0 group-hover/social:opacity-100 transition-opacity duration-300" />
-                                <div className="relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl bg-black/60 border-2 border-white/20 hover:bg-black/80 hover:border-pink-500/70 hover:scale-110 transition-all duration-300 backdrop-blur-sm">
-                                  <SimpleIcon path={siInstagram.path} title="Instagram" className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                                <div className="relative w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl bg-black/60 border-2 border-white/20 hover:bg-black/80 hover:border-pink-500/70 hover:scale-110 transition-all duration-300 backdrop-blur-sm">
+                                  <SimpleIcon path={siInstagram.path} title="Instagram" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
                                 </div>
                               </a>
                             )}
@@ -340,8 +340,22 @@ export default function AboutPage() {
                                 aria-label="GitHub"
                               >
                                 <div className="absolute inset-0 bg-blue-500/40 rounded-xl blur-xl opacity-0 group-hover/social:opacity-100 transition-opacity duration-300" />
-                                <div className="relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl bg-black/60 border-2 border-white/20 hover:bg-black/80 hover:border-blue-500/70 hover:scale-110 transition-all duration-300 backdrop-blur-sm">
-                                  <SimpleIcon path={siGithub.path} title="GitHub" className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                                <div className="relative w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl bg-black/60 border-2 border-white/20 hover:bg-black/80 hover:border-blue-500/70 hover:scale-110 transition-all duration-300 backdrop-blur-sm">
+                                  <SimpleIcon path={siGithub.path} title="GitHub" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+                                </div>
+                              </a>
+                            )}
+                            {dev.socials.aws && (
+                              <a
+                                href={dev.socials.aws}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group/social relative"
+                                aria-label="AWS"
+                              >
+                                <div className="absolute inset-0 bg-purple-500/40 rounded-xl blur-xl opacity-0 group-hover/social:opacity-100 transition-opacity duration-300" />
+                                <div className="relative w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl bg-black/60 border-2 border-white/20 hover:bg-black/80 hover:border-purple-500/70 hover:scale-110 transition-all duration-300 backdrop-blur-sm">
+                                  <Hammer className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
                                 </div>
                               </a>
                             )}
@@ -351,48 +365,48 @@ export default function AboutPage() {
                     </div>
 
                     {/* Right Column - In the Rift Info */}
-                    <div className="space-y-6">
-                      <h3 className="text-sm md:text-base text-yellow-400 uppercase tracking-widest font-bold mb-4">
+                    <div className="space-y-4 md:space-y-6">
+                      <h3 className="text-xs sm:text-sm md:text-base text-yellow-400 uppercase tracking-widest font-bold mb-2 md:mb-4">
                         In the Rift
                       </h3>
                       
-                      <div className="space-y-4">
+                      <div className="space-y-3 md:space-y-4">
                         <div className="space-y-1">
-                          <p className="text-xs text-white/50 uppercase tracking-wider">Summoner</p>
-                          <p className="text-2xl md:text-3xl text-white font-bold" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">Summoner</p>
+                          <p className="text-base sm:text-lg md:text-2xl lg:text-3xl text-white font-bold" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
                             {dev.ign}
                           </p>
                         </div>
                         
                         <div className="space-y-2">
-                          <p className="text-xs text-white/50 uppercase tracking-wider">Peak Rank</p>
-                          <div className="flex items-center space-x-3">
+                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">Peak Rank</p>
+                          <div className="flex items-center space-x-2 md:space-x-3">
                             <Image 
                               src={dev.rankImage} 
                               alt={dev.rank}
                               width={64}
                               height={64}
-                              className="w-12 h-12 md:w-16 md:h-16 object-contain"
+                              className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 object-contain"
                             />
-                            <p className="text-xl md:text-2xl text-white font-bold" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+                            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-bold" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
                               {dev.rank}
                             </p>
                           </div>
                         </div>
 
                         <div className="space-y-2">
-                          <p className="text-xs text-white/50 uppercase tracking-wider">Positions</p>
-                          <div className="flex items-center space-x-2">
+                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">Positions</p>
+                          <div className="flex items-center space-x-1.5 md:space-x-2">
                             {dev.positions.map((pos, idx) => (
                               <div key={idx} className="relative group/pos">
                                 <div className="absolute inset-0 bg-white/10 rounded-lg blur-md opacity-0 group-hover/pos:opacity-100 transition-opacity" />
-                                <div className="relative bg-black/40 rounded-lg p-2 hover:bg-black/50 transition-all">
+                                <div className="relative bg-black/40 rounded-lg p-1.5 md:p-2 hover:bg-black/50 transition-all">
                                   <Image 
                                     src={`/images/position/${pos}.svg`}
                                     alt={pos}
                                     width={32}
                                     height={32}
-                                    className="w-6 h-6 md:w-8 md:h-8 object-contain brightness-0 invert"
+                                    className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 object-contain brightness-0 invert"
                                   />
                                 </div>
                               </div>

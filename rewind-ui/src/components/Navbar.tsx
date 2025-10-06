@@ -47,7 +47,7 @@ export default function Navbar() {
             FEATURES
           </Link>
           <Link 
-            href="/games" 
+            href="https://lolesports.com/" 
             className="text-white/70 hover:text-white text-lg font-semibold transition-colors"
           >
             WORLDS25
