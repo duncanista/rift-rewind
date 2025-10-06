@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  rewind-ui-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -16,7 +16,7 @@ jobs:
       - name: Run build command
         run: cd rewind-ui && yarn build
 
-  lint:
+  rewind-ui-lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
