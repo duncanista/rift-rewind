@@ -75,3 +75,30 @@ html {
 .animate-fadeOut {
   animation: fadeOut 1.5s ease-out forwards;
 }
+
+/* Scene 1: Rectangle animations */
+@keyframes slideDownToMiddle {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpToMiddle {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.animate-slideDownToMiddle {
+  animation: slideDownToMiddle 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-slideUpToMiddle {
+  animation: slideUpToMiddle 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
