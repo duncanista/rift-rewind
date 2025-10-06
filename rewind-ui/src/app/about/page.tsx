@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { siGithub, siX, siInstagram, } from 'simple-icons';
+import { siGithub, siX, siInstagram } from 'simple-icons';
 import SimpleIcon from '@/components/SimpleIcon';
-import { Hammer} from 'lucide-react';
+import { Hammer } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import BlobBackground from '@/components/BlobBackground';
 import Footer from '@/components/Footer';
@@ -13,23 +13,23 @@ import Image from 'next/image';
 const SPLASH_CONFIG = {
   // Size of the splash art container (percentage of screen)
   splashSize: 90, // 90% of screen
-  
+
   // Gradient ellipse sizes (larger = more visible splash art)
   ellipse1: { width: 140, height: 110 }, // Primary gradient
   ellipse2: { width: 150, height: 120 }, // Secondary gradient
   ellipse3: { width: 145, height: 115 }, // Tertiary gradient
-  
+
   // Gradient positions (0-100, where the ellipse is centered)
   position1: { x: 60, y: 50 },
   position2: { x: 40, y: 40 },
   position3: { x: 50, y: 60 },
-  
+
   // Fade percentages (when fade starts and ends)
   transparentUntil1: 55, // Stay fully transparent until this %
   transparentUntil2: 60,
   transparentUntil3: 58,
-  fadeAt: 75,            // Start fading to black at this %
-  solidAt: 90,           // Fully black at this %
+  fadeAt: 75, // Start fading to black at this %
+  solidAt: 90, // Fully black at this %
 };
 
 interface Developer {
@@ -86,7 +86,7 @@ const developers: Developer[] = [
     name: 'Uri Elías',
     title: 'Software Engineer',
     company: 'Pinterest',
-    ign: 'Stardust',
+    ign: 'Stardust#SPC',
     rank: 'Master',
     rankImage: '/images/ranks/master.png',
     positions: ['mid', 'top'],
@@ -109,7 +109,7 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <BlobBackground 
+      <BlobBackground
         colors={['#8B5CF6', '#EC4899', '#1E40AF']}
         blobCount={3}
         minSizePercent={35}
@@ -117,16 +117,15 @@ export default function AboutPage() {
         centerOffset={8}
       />
       <Navbar />
-      
+
       {/* Scroll Snap Container */}
       <div className="snap-y snap-mandatory h-screen overflow-y-auto pt-16 md:pt-20">
-        
         {/* Intro Section */}
         <section className="snap-start h-screen shrink-0 flex items-center justify-center px-4 md:px-8 relative">
           <div className="max-w-6xl w-full space-y-8">
             {/* Title */}
             <div className="text-center space-y-6">
-              <h1 
+              <h1
                 className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-bold text-white leading-tight"
                 style={{ fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)' }}
               >
@@ -144,22 +143,22 @@ export default function AboutPage() {
             {/* Content */}
             <div className="space-y-6 text-white/90 text-base sm:text-lg md:text-xl leading-relaxed text-center max-w-6xl mx-auto mb-16">
               <p className="text-lg sm:text-xl md:text-3xl font-medium pb-4">
-                We&apos;re a team of passionate hackers, League of Legends players, and esports enthusiasts 
-                who&apos;ve experienced the thrill of Worlds firsthand — multiple times. We know what it&apos;s 
-                like to live and breathe this game.
+                We&apos;re a team of passionate hackers, League of Legends players, and esports enthusiasts
+                who&apos;ve experienced the thrill of Worlds firsthand — multiple times. We know what
+                it&apos;s like to live and breathe this game.
               </p>
               <p>
                 <span className="text-white font-semibold">Rift Rewind</span> was born from the{' '}
-                <a 
-                  href="https://riftrewind.devpost.com/" 
-                  target="_blank" 
+                <a
+                  href="https://riftrewind.devpost.com/"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-purple-400 hover:text-purple-300 underline decoration-purple-400/50 underline-offset-4 transition-colors"
                 >
                   AWS and Riot Games Hackathon
                 </a>
-                , challenging developers to build AI-powered agents that transform League API match data 
-                into personalized insights. Using AWS AI services like Amazon Bedrock, we&apos;re creating 
+                , challenging developers to build AI-powered agents that transform League API match data into
+                personalized insights. Using AWS AI services like Amazon Bedrock, we&apos;re creating
                 intelligent year-end recaps that go beyond basic stats.
               </p>
             </div>
@@ -182,9 +181,9 @@ export default function AboutPage() {
               </svg>
             </div>
           </div>
-          
+
           {/* Bottom Organic Gradient Fade */}
-          <div 
+          <div
             className="absolute bottom-0 left-0 right-0 h-[20vh] pointer-events-none z-10"
             style={{
               background: `
@@ -205,23 +204,23 @@ export default function AboutPage() {
           >
             {/* Champion Splash Art Background - Configurable size, centered */}
             <div className="absolute inset-0 z-0 flex items-center justify-center bg-black">
-              <div 
+              <div
                 className="relative"
-                style={{ 
-                  width: `${SPLASH_CONFIG.splashSize}%`, 
-                  height: `${SPLASH_CONFIG.splashSize}%` 
+                style={{
+                  width: `${SPLASH_CONFIG.splashSize}%`,
+                  height: `${SPLASH_CONFIG.splashSize}%`,
                 }}
               >
                 {/* Champion Image */}
-                <div 
+                <div
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                  style={{ 
+                  style={{
                     backgroundImage: `url(${dev.championSplash})`,
                     filter: 'blur(0px)',
                   }}
                 />
                 {/* Organic Edge Fade Mask - Creates dissolving edges */}
-                <div 
+                <div
                   className="absolute inset-0"
                   style={{
                     background: `
@@ -244,13 +243,12 @@ export default function AboutPage() {
             {/* Content */}
             <div className="relative z-10 w-full max-w-none h-full flex items-center px-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 lg:gap-16 xl:gap-20 items-center w-full">
-                
                 {/* Left Side - Image (1/3 width) */}
                 <div className="flex items-center justify-center md:justify-end">
                   <div className="relative group/img">
                     {/* Outer Glow Ring */}
                     <div className="absolute -inset-6 bg-gradient-to-r from-purple-600/30 via-pink-600/30 to-blue-600/30 rounded-full blur-3xl opacity-40 group-hover/img:opacity-60 transition duration-700"></div>
-                    
+
                     {/* Image Container */}
                     <div className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-4 border-white/30 shadow-2xl transform group-hover/img:scale-105 transition-transform duration-500">
                       <div className="w-full h-full bg-gradient-to-br from-purple-900/50 via-pink-900/50 to-blue-900/50 flex items-center justify-center">
@@ -264,9 +262,9 @@ export default function AboutPage() {
                 <div className="md:col-span-2 flex flex-col justify-center space-y-6 md:space-y-8">
                   {/* Name */}
                   <div>
-                    <h2 
+                    <h2
                       className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-bold text-white leading-none mb-4"
-                      style={{ 
+                      style={{
                         fontFamily: 'var(--font-zalando-sans, "Zalando Sans Expanded", sans-serif)',
                         textShadow: '0 4px 20px rgba(0,0,0,0.8)',
                       }}
@@ -283,25 +281,35 @@ export default function AboutPage() {
                       <h3 className="text-xs sm:text-sm md:text-base text-purple-400 uppercase tracking-widest font-bold mb-2 md:mb-4">
                         IRL
                       </h3>
-                      
+
                       <div className="space-y-3 md:space-y-4">
                         <div className="space-y-1">
-                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">Title</p>
-                          <p className="text-base sm:text-lg md:text-2xl lg:text-3xl text-white font-bold" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">
+                            Title
+                          </p>
+                          <p
+                            className="text-base sm:text-lg md:text-2xl lg:text-3xl text-white font-bold"
+                            style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}
+                          >
                             {dev.title}
                           </p>
                         </div>
-                        
+
                         <div className="space-y-1">
                           <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">At</p>
-                          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/70 font-medium" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+                          <p
+                            className="text-sm sm:text-base md:text-lg lg:text-xl text-white/70 font-medium"
+                            style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}
+                          >
                             {dev.company}
                           </p>
                         </div>
 
                         {/* Social Links */}
                         <div className="pt-2">
-                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider mb-2 md:mb-3">Socials</p>
+                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider mb-2 md:mb-3">
+                            Socials
+                          </p>
                           <div className="flex items-center space-x-2 md:space-x-3">
                             {dev.socials.twitter && (
                               <a
@@ -313,7 +321,11 @@ export default function AboutPage() {
                               >
                                 <div className="absolute inset-0 bg-purple-500/40 rounded-xl blur-xl opacity-0 group-hover/social:opacity-100 transition-opacity duration-300" />
                                 <div className="relative w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl bg-black/60 border-2 border-white/20 hover:bg-black/80 hover:border-purple-500/70 hover:scale-110 transition-all duration-300 backdrop-blur-sm">
-                                  <SimpleIcon path={siX.path} title="X" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+                                  <SimpleIcon
+                                    path={siX.path}
+                                    title="X"
+                                    className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white"
+                                  />
                                 </div>
                               </a>
                             )}
@@ -327,7 +339,11 @@ export default function AboutPage() {
                               >
                                 <div className="absolute inset-0 bg-pink-500/40 rounded-xl blur-xl opacity-0 group-hover/social:opacity-100 transition-opacity duration-300" />
                                 <div className="relative w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl bg-black/60 border-2 border-white/20 hover:bg-black/80 hover:border-pink-500/70 hover:scale-110 transition-all duration-300 backdrop-blur-sm">
-                                  <SimpleIcon path={siInstagram.path} title="Instagram" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+                                  <SimpleIcon
+                                    path={siInstagram.path}
+                                    title="Instagram"
+                                    className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white"
+                                  />
                                 </div>
                               </a>
                             )}
@@ -341,7 +357,11 @@ export default function AboutPage() {
                               >
                                 <div className="absolute inset-0 bg-blue-500/40 rounded-xl blur-xl opacity-0 group-hover/social:opacity-100 transition-opacity duration-300" />
                                 <div className="relative w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl bg-black/60 border-2 border-white/20 hover:bg-black/80 hover:border-blue-500/70 hover:scale-110 transition-all duration-300 backdrop-blur-sm">
-                                  <SimpleIcon path={siGithub.path} title="GitHub" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+                                  <SimpleIcon
+                                    path={siGithub.path}
+                                    title="GitHub"
+                                    className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white"
+                                  />
                                 </div>
                               </a>
                             )}
@@ -369,39 +389,51 @@ export default function AboutPage() {
                       <h3 className="text-xs sm:text-sm md:text-base text-yellow-400 uppercase tracking-widest font-bold mb-2 md:mb-4">
                         In the Rift
                       </h3>
-                      
+
                       <div className="space-y-3 md:space-y-4">
                         <div className="space-y-1">
-                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">Summoner</p>
-                          <p className="text-base sm:text-lg md:text-2xl lg:text-3xl text-white font-bold" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">
+                            Summoner
+                          </p>
+                          <p
+                            className="text-base sm:text-lg md:text-2xl lg:text-3xl text-white font-bold"
+                            style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}
+                          >
                             {dev.ign}
                           </p>
                         </div>
-                        
+
                         <div className="space-y-2">
-                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">Peak Rank</p>
+                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">
+                            Peak Rank
+                          </p>
                           <div className="flex items-center space-x-2 md:space-x-3">
-                            <Image 
-                              src={dev.rankImage} 
+                            <Image
+                              src={dev.rankImage}
                               alt={dev.rank}
                               width={64}
                               height={64}
                               className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 object-contain"
                             />
-                            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-bold" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+                            <p
+                              className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-bold"
+                              style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}
+                            >
                               {dev.rank}
                             </p>
                           </div>
                         </div>
 
                         <div className="space-y-2">
-                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">Positions</p>
+                          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider">
+                            Positions
+                          </p>
                           <div className="flex items-center space-x-1.5 md:space-x-2">
                             {dev.positions.map((pos, idx) => (
                               <div key={idx} className="relative group/pos">
                                 <div className="absolute inset-0 bg-white/10 rounded-lg blur-md opacity-0 group-hover/pos:opacity-100 transition-opacity" />
                                 <div className="relative bg-black/40 rounded-lg p-1.5 md:p-2 hover:bg-black/50 transition-all">
-                                  <Image 
+                                  <Image
                                     src={`/images/position/${pos}.svg`}
                                     alt={pos}
                                     width={32}
@@ -421,7 +453,7 @@ export default function AboutPage() {
             </div>
           </section>
         ))}
-        
+
         {/* Footer Section - Inside scroll container */}
         <section className="snap-start shrink-0 bg-black">
           <Footer />
