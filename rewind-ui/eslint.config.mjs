@@ -14,7 +14,7 @@ const eslintConfig = [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
     rules: {
-      quotes: ['error', 'single'], // Enforce single quotes
+      quotes: ['error', 'double'], // Enforce single quotes
       semi: ['error', 'always'], // Require semicolons
       'no-unused-vars': ['error'], // Warn about unused variables
       'no-console': ['warn'], // Warn about console.log usage
