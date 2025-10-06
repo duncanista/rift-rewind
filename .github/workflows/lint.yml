@@ -15,4 +15,4 @@ jobs:
         run: cd rewind-ui && yarn install
 
       - name: Run linter
-        run: yarn lint --fix
+        run: cd rewind-ui && yarn lint --fix
