@@ -24,9 +24,14 @@ def create_queue(puuid: str) -> str:
     return response["QueueUrl"]
 
 
-def send_messages_to_queue(queue_url: str, matches: List[str]) -> None:
+SQS_MESSAGE_STRUCTURE = {
+    "match_id": str,
+    "puuid": str,
+}
+
+def send_messages_to_queue(puuid: str, queue_url: str, matches: List[str]) -> None:
     for match in matches:
-        SQS_CLIENT.send_message(QueueUrl=queue_url, MessageBody=json.dumps(match))
+            SQS_CLIENT.send_message(QueueUrl=queue_url, MessageBody=json.dumps(SQS_MESSAGE_STRUCTURE(match_id=match, puuid=puuid)))
 
 
 def start_step_function_execution(
@@ -75,7 +80,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
     # Send messages to the queue
     try:
-        send_messages_to_queue(queue_url, matches)
+        send_messages_to_queue(puuid, queue_url, matches)
     except Exception as e:
         return {
             "statusCode": 500,
