@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import BlobBackground from "@/components/BlobBackground";
 import Footer from "@/components/Footer";
 import { 
+  FavoriteChampionScene,
   HoursPlayedScene,
   TopChampionsScene, 
   TopRolesScene,
@@ -103,7 +104,7 @@ const MOCK_AGGREGATED_DATA: AggregatedData = {
 };
 
 // Animation scene configuration
-type AnimationScene = "idle" | "hours" | "scene1" | "roles" | "top2roles" | "summary";
+type AnimationScene = "idle" | "favorite" | "hours" | "scene1" | "roles" | "top2roles" | "summary";
 
 // Helper function to map API position names to UI display names
 function mapPositionName(position: string): string {
@@ -146,6 +147,7 @@ export default function ChronobreakPage() {
   const [currentScene, setCurrentScene] = useState<AnimationScene>("idle");
   const [isAnimating, setIsAnimating] = useState(false);
   const [showRectangles, setShowRectangles] = useState(false);
+  const [showFavorite, setShowFavorite] = useState(false);
   const [showHours, setShowHours] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showRoles, setShowRoles] = useState(false);
@@ -157,7 +159,7 @@ export default function ChronobreakPage() {
   // Story progress management
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [storyProgress, setStoryProgress] = useState(0);
-  const totalStories = 5; // 1 hours played + 1 top champions scene + 1 top 2 roles scene + 1 top 5 roles scene + 1 summary scene
+  const totalStories = 6; // 1 favorite champion + 1 hours played + 1 top champions scene + 1 top 2 roles scene + 1 top 5 roles scene + 1 summary scene
   const storyDuration = 10000; // 10 seconds per story
   
   // Use fetched data or fallback to mock data
@@ -166,20 +168,26 @@ export default function ChronobreakPage() {
   // Transform aggregated data for components
   const totalGames = dataToUse.won + dataToUse.lost;
   
+  // Favorite (most played) champion
+  const favoriteChampionEntry = Object.entries(dataToUse.champions)
+    .sort(([, a], [, b]) => b - a)[0];
+  const favoriteChampion = favoriteChampionEntry ? {
+    name: favoriteChampionEntry[0],
+    games: favoriteChampionEntry[1],
+  } : { name: "Unknown", games: 0 };
+  
   // Calculate hours played (match_duration is in seconds, convert to hours and round up)
   const hoursPlayed = Math.ceil(dataToUse.match_duration / 3600);
   
   // Top 5 Champions - sorted by games played
+  // Using Riot Data Dragon CDN for champion images
   const topChampions = Object.entries(dataToUse.champions)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5)
     .map(([name, games]) => ({
       name,
       games,
-      // Using existing placeholder images for now
-      icon: name === "Lux" ? "/images/champions/lux-splashart.webp" : 
-        name === "Morgana" ? "/images/champions/katarina-splashart.webp" :
-          "/images/champions/udyr-splashart.webp",
+      icon: `https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/${name}.png`,
     }));
 
   // Top 5 Roles with percentages
@@ -298,6 +306,7 @@ export default function ChronobreakPage() {
     timeoutRefs.current = [];
     
     // Immediately clear all scene states to prevent overlap
+    setShowFavorite(false);
     setShowHours(false);
     setShowStats(false);
     setShowRoles(false);
@@ -308,8 +317,8 @@ export default function ChronobreakPage() {
     setStoryProgress(0);
     setIsAnimating(true);
     
-    // Scene sequence: hours -> scene1 (top champions) -> top2roles (top 2) -> roles (top 5) -> summary
-    // Check if this is the summary scene (last story, index 4)
+    // Scene sequence: hours -> favorite -> scene1 (top champions) -> top2roles (top 2) -> roles (top 5) -> summary
+    // Check if this is the summary scene (last story, index 5)
     if (index === totalStories - 1) {
       setCurrentScene("summary");
       // Use setTimeout to ensure state is cleared first
@@ -318,8 +327,8 @@ export default function ChronobreakPage() {
       }, 0);
       timeoutRefs.current.push(timeout);
     } 
-    // Check if this is the top 5 roles scene (index 3)
-    else if (index === 3) {
+    // Check if this is the top 5 roles scene (index 4)
+    else if (index === 4) {
       setCurrentScene("roles");
       // Use setTimeout to ensure state is cleared first
       const timeout = setTimeout(() => {
@@ -328,8 +337,8 @@ export default function ChronobreakPage() {
       }, 0);
       timeoutRefs.current.push(timeout);
     }
-    // Check if this is the top 2 roles scene (index 2)
-    else if (index === 2) {
+    // Check if this is the top 2 roles scene (index 3)
+    else if (index === 3) {
       setCurrentScene("top2roles");
       // Use setTimeout to ensure state is cleared first
       const timeout = setTimeout(() => {
@@ -338,8 +347,8 @@ export default function ChronobreakPage() {
       }, 0);
       timeoutRefs.current.push(timeout);
     } 
-    // Top champions scene (index 1)
-    else if (index === 1) {
+    // Top champions scene (index 2)
+    else if (index === 2) {
       setCurrentScene("scene1");
       
       // Wait 700ms for content to fade out, then show rectangles
@@ -353,6 +362,15 @@ export default function ChronobreakPage() {
         setShowStats(true);
       }, 2200);
       timeoutRefs.current.push(timeout2);
+    }
+    // Favorite champion scene (index 1)
+    else if (index === 1) {
+      setCurrentScene("favorite");
+      // Use setTimeout to ensure state is cleared first
+      const timeout = setTimeout(() => {
+        setShowFavorite(true);
+      }, 0);
+      timeoutRefs.current.push(timeout);
     }
     // Hours played scene (index 0)
     else {
@@ -378,6 +396,7 @@ export default function ChronobreakPage() {
       console.log("All stories completed");
       setIsAnimating(false);
       setShowRectangles(false);
+      setShowFavorite(false);
       setShowHours(false);
       setShowStats(false);
       setShowRoles(false);
@@ -419,7 +438,7 @@ export default function ChronobreakPage() {
 
       return () => clearTimeout(timer);
     }
-    
+
     // For the summary scene (last one), don't auto-advance
     // User can manually close or stay on it
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -539,6 +558,14 @@ export default function ChronobreakPage() {
 
       {/* Rectangle Animation Background */}
       <RectangleAnimation show={showRectangles} />
+
+      {/* Favorite Champion Scene */}
+      {showFavorite && currentScene === "favorite" && (
+        <FavoriteChampionScene 
+          championName={favoriteChampion.name} 
+          gamesPlayed={favoriteChampion.games} 
+        />
+      )}
 
       {/* Hours Played Scene */}
       {showHours && currentScene === "hours" && <HoursPlayedScene hours={hoursPlayed} />}

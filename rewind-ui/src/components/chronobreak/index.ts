@@ -1,3 +1,4 @@
+export { default as FavoriteChampionScene } from "./FavoriteChampionScene";
 export { default as HoursPlayedScene } from "./HoursPlayedScene";
 export { default as TopChampionsScene } from "./TopChampionsScene";
 export { default as TopRolesScene } from "./TopRolesScene";
