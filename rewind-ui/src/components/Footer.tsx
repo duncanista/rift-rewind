@@ -43,14 +43,6 @@ export default function Footer() {
                   rel="noopener noreferrer"
                   className="text-base font-medium text-white/60 hover:text-white/90 transition-colors"
                 >
-                  Blog
-                </a>
-                <a
-                  href="https://builder.aws.com/content/2cL6U7m5JvOIgYbGtzZT7E0NBR0/rift-rewind-ready-for-a-chronobreak"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base font-medium text-white/60 hover:text-white/90 transition-colors"
-                >
                   Challenge 1
                 </a>
                 <span className="text-base font-medium text-white/35 cursor-not-allowed">
@@ -79,15 +71,6 @@ export default function Footer() {
                 className="text-sm font-medium text-white/60 hover:text-white/90 transition-colors"
               >
                 About
-              </a>
-
-              <a
-                href="https://builder.aws.com/content/2cL6U7m5JvOIgYbGtzZT7E0NBR0/rift-rewind-ready-for-a-chronobreak"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-medium text-white/60 hover:text-white/90 transition-colors"
-              >
-                Blog
               </a>
 
               <a
