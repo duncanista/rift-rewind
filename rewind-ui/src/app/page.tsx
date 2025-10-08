@@ -3,17 +3,18 @@
 import Navbar from "@/components/Navbar";
 import BlobBackground from "@/components/BlobBackground";
 import Footer from "@/components/Footer";
+import ProPlayerCarousel from "@/components/ProPlayerCarousel";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useState, FormEvent, useMemo, useEffect, useRef } from "react";
+import { useState, FormEvent, useMemo, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function Home() {
   const router = useRouter();
   const [riotId, setRiotId] = useState("");
-  const [region, setRegion] = useState("na1");
+  const [region, setRegion] = useState("");
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFading, setIsFading] = useState(false);
   const [pendingUid, setPendingUid] = useState<string | null>(null);
@@ -21,6 +22,12 @@ export default function Home() {
   
   // Memoize colors array to prevent BlobBackground from re-initializing on every render
   const blobColors = useMemo(() => ["#8B5CF6", "#EC4899", "#1E40AF"], []);
+
+  // Handle player selection from carousel (memoized to prevent unnecessary re-renders)
+  const handlePlayerSelect = useCallback((playerRiotId: string, playerRegion: string) => {
+    setRiotId(playerRiotId);
+    setRegion(playerRegion);
+  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -132,7 +139,7 @@ export default function Home() {
                   name="riot-id"
                   value={riotId}
                   onChange={(e) => setRiotId(e.target.value)}
-                  placeholder="GameName#TAG"
+                  placeholder="Hide on bush#KR1"
                   required
                   className="flex-1 border-0 bg-transparent focus:ring-0 rounded-none text-sm sm:text-base"
                 />
@@ -142,8 +149,10 @@ export default function Home() {
                   name="region"
                   value={region}
                   onChange={(e) => setRegion(e.target.value)}
+                  required
                   className="w-[80px] sm:w-[100px] border-0 bg-transparent focus:ring-0 rounded-none text-sm sm:text-base"
                 >
+                  <option value="">Region</option>
                   <option value="na1">NA</option>
                   <option value="euw1">EUW</option>
                   <option value="eun1">EUNE</option>
@@ -160,12 +169,17 @@ export default function Home() {
 
               <Button
                 type="submit"
-                className="w-full py-3 md:py-4 text-base md:text-lg"
+                className={`w-full py-3 md:py-4 text-base md:text-lg transition-all ${
+                  riotId ? "animate-breathe" : ""
+                }`}
               >
                 REWIND
               </Button>
             </div>
           </form>
+
+          {/* Pro Players Carousel */}
+          <ProPlayerCarousel onPlayerSelect={handlePlayerSelect} />
         </div>
       </main>
       <Footer />
@@ -195,6 +209,26 @@ export default function Home() {
           >
             <source src="/videos/ekko-chronobreak.mp4" type="video/mp4" />
           </video>
+          
+          {/* Skip button overlay */}
+          <button
+            onClick={() => {
+              if (pendingUid) {
+                router.push(`/chronobreak/${pendingUid}?transition=true&region=${region}`);
+              }
+            }}
+            className="absolute bottom-8 right-8 px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-lg text-white font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/30 z-[10000] flex items-center gap-2"
+          >
+            <span>Skip</span>
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              viewBox="0 0 24 24" 
+              fill="currentColor" 
+              className="w-5 h-5"
+            >
+              <path d="M5.055 7.06C3.805 6.347 2.25 7.25 2.25 8.69v6.62c0 1.44 1.555 2.343 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256L5.055 7.061zM17.25 4.5v15a.75.75 0 001.5 0v-15a.75.75 0 00-1.5 0z" />
+            </svg>
+          </button>
         </div>
       )}
     </div>
