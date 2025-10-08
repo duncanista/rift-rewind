@@ -14,6 +14,7 @@ const PRO_PLAYERS = [
 ];
 
 interface ProPlayerCarouselProps {
+  // eslint-disable-next-line no-unused-vars
   onPlayerSelect: (riotId: string, region: string) => void;
 }
 
@@ -66,61 +67,61 @@ export default function ProPlayerCarousel({ onPlayerSelect }: ProPlayerCarouselP
         {/* 3D Carousel */}
         <div className="relative">
           <div className="carousel-3d-container">
-          <div
-            className="carousel-3d-scene"
-            style={{
-              transform: `rotateY(${rotationAngle}deg)`,
-            }}
-          >
-            {PRO_PLAYERS.map((player, index) => {
-              const angle = (index * 360) / PRO_PLAYERS.length;
-              const radius = 125;
+            <div
+              className="carousel-3d-scene"
+              style={{
+                transform: `rotateY(${rotationAngle}deg)`,
+              }}
+            >
+              {PRO_PLAYERS.map((player, index) => {
+                const angle = (index * 360) / PRO_PLAYERS.length;
+                const radius = 125;
 
-              // Calculate which positions are visible (previous, current, next)
-              const diff = (index - currentPlayerIndex + PRO_PLAYERS.length) % PRO_PLAYERS.length;
-              const isVisible = diff === 0 || diff === 1 || diff === PRO_PLAYERS.length - 1;
-              const isCurrent = diff === 0;
-              const isSelected = selectedPlayerIndex === index;
+                // Calculate which positions are visible (previous, current, next)
+                const diff = (index - currentPlayerIndex + PRO_PLAYERS.length) % PRO_PLAYERS.length;
+                const isVisible = diff === 0 || diff === 1 || diff === PRO_PLAYERS.length - 1;
+                const isCurrent = diff === 0;
+                const isSelected = selectedPlayerIndex === index;
 
-              return (
-                <div
-                  key={`${player.id}-${index}`}
-                  className="carousel-3d-item"
-                  style={{
-                    transform: `rotateY(${angle}deg) translateZ(${radius}px)${isCurrent ? "" : " scale(0.85)"}`,
-                    opacity: isVisible ? (isCurrent ? 1 : 0.6) : 0,
-                    pointerEvents: isVisible ? "auto" : "none",
-                    zIndex: isCurrent ? 10 : isVisible ? 5 : 0,
-                  }}
-                >
-                  <button
-                    onClick={isCurrent ? selectCurrentPlayer : undefined}
-                    disabled={!isCurrent}
-                    className={`relative w-full h-full rounded-lg overflow-hidden border transition-all duration-300 ${
-                      isSelected ? "border-purple-500 shadow-lg shadow-purple-500/50" : "border-white/20"
-                    } ${isCurrent ? "cursor-pointer hover:border-purple-400" : ""}`}
+                return (
+                  <div
+                    key={`${player.id}-${index}`}
+                    className="carousel-3d-item"
+                    style={{
+                      transform: `rotateY(${angle}deg) translateZ(${radius}px)${isCurrent ? "" : " scale(0.85)"}`,
+                      opacity: isVisible ? (isCurrent ? 1 : 0.6) : 0,
+                      pointerEvents: isVisible ? "auto" : "none",
+                      zIndex: isCurrent ? 10 : isVisible ? 5 : 0,
+                    }}
                   >
-                    <Image src={player.image} alt={player.name} width={112} height={112} className="w-full h-full object-cover" />
+                    <button
+                      onClick={isCurrent ? selectCurrentPlayer : undefined}
+                      disabled={!isCurrent}
+                      className={`relative w-full h-full rounded-lg overflow-hidden border transition-all duration-300 ${
+                        isSelected ? "border-purple-500 shadow-lg shadow-purple-500/50" : "border-white/20"
+                      } ${isCurrent ? "cursor-pointer hover:border-purple-400" : ""}`}
+                    >
+                      <Image src={player.image} alt={player.name} width={112} height={112} className="w-full h-full object-cover" />
                     
-                    {/* Shadow overlay on previous/next players */}
-                    {!isCurrent && (
-                      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/70" />
-                    )}
+                      {/* Shadow overlay on previous/next players */}
+                      {!isCurrent && (
+                        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/70" />
+                      )}
                     
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent py-1.5 z-10">
-                      <p
-                        className={`text-white text-center transition-all ${
-                          isCurrent ? "text-xs font-medium" : "text-[10px] font-normal"
-                        }`}
-                      >
-                        {player.name}
-                      </p>
-                    </div>
-                  </button>
-                </div>
-              );
-            })}
-          </div>
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent py-1.5 z-10">
+                        <p
+                          className={`text-white text-center transition-all ${
+                            isCurrent ? "text-xs font-medium" : "text-[10px] font-normal"
+                          }`}
+                        >
+                          {player.name}
+                        </p>
+                      </div>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
