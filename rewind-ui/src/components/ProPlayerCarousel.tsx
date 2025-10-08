@@ -156,16 +156,16 @@ export default function ProPlayerCarousel({ onPlayerSelect }: ProPlayerCarouselP
                 const isSelected = selectedPlayerIndex === index;
 
                 return (
-                <div
-                  key={`${player.id}-${index}`}
-                  className="carousel-3d-item"
-                  style={{
-                    transform: `rotateY(${angle}deg) translateZ(${radius}px)${isCurrent ? " scale(1.15)" : " scale(0.85)"}`,
-                    opacity: isVisible ? (isCurrent ? 1 : 0.6) : 0,
-                    pointerEvents: isVisible ? "auto" : "none",
-                    zIndex: isCurrent ? 10 : isVisible ? 5 : 0,
-                  }}
-                >
+                  <div
+                    key={`${player.id}-${index}`}
+                    className="carousel-3d-item"
+                    style={{
+                      transform: `rotateY(${angle}deg) translateZ(${radius}px)${isCurrent ? " scale(1.15)" : " scale(0.85)"}`,
+                      opacity: isVisible ? (isCurrent ? 1 : 0.6) : 0,
+                      pointerEvents: isVisible ? "auto" : "none",
+                      zIndex: isCurrent ? 10 : isVisible ? 5 : 0,
+                    }}
+                  >
                     <button
                       onClick={isCurrent ? selectCurrentPlayer : undefined}
                       disabled={!isCurrent}
