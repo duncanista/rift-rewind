@@ -14,7 +14,7 @@ import Image from "next/image";
 export default function Home() {
   const router = useRouter();
   const [riotId, setRiotId] = useState("");
-  const [region, setRegion] = useState("");
+  const [region, setRegion] = useState("na1");
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFading, setIsFading] = useState(false);
   const [pendingUid, setPendingUid] = useState<string | null>(null);
@@ -75,7 +75,7 @@ export default function Home() {
   }, [isPlaying, pendingUid, region, router]);
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col min-h-screen">
       <BlobBackground 
         colors={blobColors}
         blobCount={3}
@@ -84,7 +84,7 @@ export default function Home() {
         centerOffset={8}
       />
       <Navbar />
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 overflow-hidden relative">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-6 md:py-12 overflow-hidden relative min-h-[calc(100vh-64px)] md:min-h-0">
         {/* Heimerdinger Emote - Top Left */}
         <div className="absolute pointer-events-none left-4 top-24 sm:left-8 sm:top-28 z-0 lg:left-[calc(50%_-_580px)] lg:top-1/2 lg:-translate-y-1/2 xl:left-[calc(50%_-_650px)]">
           <Image
@@ -152,7 +152,6 @@ export default function Home() {
                   required
                   className="w-[80px] sm:w-[100px] border-0 bg-transparent focus:ring-0 rounded-none text-sm sm:text-base"
                 >
-                  <option value="">Region</option>
                   <option value="na1">NA</option>
                   <option value="euw1">EUW</option>
                   <option value="eun1">EUNE</option>
