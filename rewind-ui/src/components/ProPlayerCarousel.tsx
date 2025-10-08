@@ -22,8 +22,12 @@ export default function ProPlayerCarousel({ onPlayerSelect }: ProPlayerCarouselP
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [rotationAngle, setRotationAngle] = useState(0);
   const [selectedPlayerIndex, setSelectedPlayerIndex] = useState<number | null>(null);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const anglePerPlayer = 360 / PRO_PLAYERS.length;
+  const minSwipeDistance = 50; // Minimum distance for a swipe
 
   const goToPrevious = () => {
     const newIndex = (currentPlayerIndex - 1 + PRO_PLAYERS.length) % PRO_PLAYERS.length;
@@ -49,23 +53,91 @@ export default function ProPlayerCarousel({ onPlayerSelect }: ProPlayerCarouselP
     onPlayerSelect(player.riotId, player.region);
   };
 
+  // Touch handlers for swipe
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      goToNext();
+    } else if (isRightSwipe) {
+      goToPrevious();
+    }
+  };
+
+  // Mouse handlers for drag (desktop)
+  const onMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setTouchEnd(null);
+    setTouchStart(e.clientX);
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    setTouchEnd(e.clientX);
+  };
+
+  const onMouseUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      goToNext();
+    } else if (isRightSwipe) {
+      goToPrevious();
+    }
+  };
+
+  const onMouseLeave = () => {
+    if (isDragging) {
+      setIsDragging(false);
+    }
+  };
+
   return (
-    <div className="mt-6 relative z-10">
-      <p className="text-center text-xs text-gray-400 mb-4">or try a pro player</p>
-      <div className="flex items-center justify-center gap-4">
+    <div className="mt-4 md:mt-6 relative z-10 px-2">
+      <p className="text-center text-xs text-gray-400 mb-3 md:mb-4">or try a pro player</p>
+      <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-4">
         {/* Left Chevron */}
         <button
           onClick={goToPrevious}
-          className="p-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300 hover:scale-110 z-20 relative"
+          className="p-1.5 sm:p-2 md:p-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300 hover:scale-110 z-20 relative flex-shrink-0"
           aria-label="Previous player"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 sm:w-5 sm:h-5 text-white">
             <path fillRule="evenodd" d="M7.72 12.53a.75.75 0 010-1.06l7.5-7.5a.75.75 0 111.06 1.06L9.31 12l6.97 6.97a.75.75 0 11-1.06 1.06l-7.5-7.5z" clipRule="evenodd" />
           </svg>
         </button>
 
         {/* 3D Carousel */}
-        <div className="relative">
+        <div 
+          className="relative flex-shrink-0 touch-pan-y select-none cursor-grab active:cursor-grabbing"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={onMouseLeave}
+        >
           <div className="carousel-3d-container">
             <div
               className="carousel-3d-scene"
@@ -88,7 +160,7 @@ export default function ProPlayerCarousel({ onPlayerSelect }: ProPlayerCarouselP
                     key={`${player.id}-${index}`}
                     className="carousel-3d-item"
                     style={{
-                      transform: `rotateY(${angle}deg) translateZ(${radius}px)${isCurrent ? "" : " scale(0.85)"}`,
+                      transform: `rotateY(${angle}deg) translateZ(${radius}px)${isCurrent ? " scale(1.15)" : " scale(0.85)"}`,
                       opacity: isVisible ? (isCurrent ? 1 : 0.6) : 0,
                       pointerEvents: isVisible ? "auto" : "none",
                       zIndex: isCurrent ? 10 : isVisible ? 5 : 0,
@@ -108,10 +180,10 @@ export default function ProPlayerCarousel({ onPlayerSelect }: ProPlayerCarouselP
                         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/70" />
                       )}
                     
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent py-1.5 z-10">
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent py-1 sm:py-1.5 z-10">
                         <p
                           className={`text-white text-center transition-all ${
-                            isCurrent ? "text-xs font-medium" : "text-[10px] font-normal"
+                            isCurrent ? "text-[10px] sm:text-xs font-medium" : "text-[8px] sm:text-[10px] font-normal"
                           }`}
                         >
                           {player.name}
@@ -128,10 +200,10 @@ export default function ProPlayerCarousel({ onPlayerSelect }: ProPlayerCarouselP
         {/* Right Chevron */}
         <button
           onClick={goToNext}
-          className="p-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300 hover:scale-110 z-20 relative"
+          className="p-1.5 sm:p-2 md:p-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300 hover:scale-110 z-20 relative flex-shrink-0"
           aria-label="Next player"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 sm:w-5 sm:h-5 text-white">
             <path fillRule="evenodd" d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z" clipRule="evenodd" />
           </svg>
         </button>
