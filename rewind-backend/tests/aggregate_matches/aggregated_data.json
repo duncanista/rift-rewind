@@ -1,0 +1,42 @@
+{
+    "pings": {
+        "allInPings": 5,
+        "assistMePings": 51,
+        "basicPings": 0,
+        "commandPings": 181,
+        "dangerPings": 0,
+        "enemyMissingPings": 84,
+        "enemyVisionPings": 99,
+        "getBackPings": 41,
+        "holdPings": 0,
+        "needVisionPings": 20,
+        "onMyWayPings": 379,
+        "pushPings": 20,
+        "visionClearedPings": 0
+    },
+    "kills": 47,
+    "deaths": 66,
+    "assists": 95,
+    "cs": 1380,
+    "vision_score": 293,
+    "wards_placed": 146,
+    "wards_killed": 35,
+    "early_surrender": 0,
+    "first_blood": 4,
+    "match_duration": 17422,
+    "won": 8,
+    "lost": 2,
+    "champions": {
+        "Morgana": 7,
+        "Qiyana": 1,
+        "Lux": 1,
+        "Mordekaiser": 1
+    },
+    "positions": {
+        "TOP": 1,
+        "JUNGLE": 0,
+        "MIDDLE": 8,
+        "BOTTOM": 0,
+        "UTILITY": 1
+    }
+}

@@ -6,16 +6,12 @@ fetch match data from Riot API, aggregate it, and return the result.
 
 import json
 import os
-import sys
-from pathlib import Path
 from typing import Dict, Any
 import boto3
 from botocore.exceptions import ClientError
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from common.fetch_api import RiotAPIClient
-from aggregator.aggregator import MatchDataAggregator
+from lib.riot_api import RiotAPIClient
+from lib.match_data_aggregator import MatchDataAggregator
 
 # Cache for API key to avoid multiple Secrets Manager calls
 _api_key_cache = None

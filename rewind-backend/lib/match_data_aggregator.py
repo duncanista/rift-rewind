@@ -1,15 +1,21 @@
 from typing import List, Dict, Any
 
-from common.fetch_api import MatchAnalyzer
-
+from lib.match_analyzer import MatchAnalyzer
 
 class MatchDataAggregator:
+    """Aggregates match statistics across multiple games for a player."""
+    
     def __init__(self, puuid: str, match_data_list: List[Dict[str, Any]]):
+        """Initialize aggregator with player puuid and list of match data."""
+
         self.puuid = puuid
         self.match_data_list = match_data_list
         self.aggregated_data = self.aggregate_match_data()
 
     def aggregate_match_data(self) -> Dict[str, Any]:
+        """Aggregate statistics from all matches including pings, KDA, 
+        vision, champions, and positions."""
+
         aggregated_data = {
             "pings": {
                 "allInPings": 0,
