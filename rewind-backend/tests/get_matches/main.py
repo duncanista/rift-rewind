@@ -1,7 +1,13 @@
-from fetch_api import RiotAPIClient
+import sys
+from pathlib import Path
+
+# Import library from root directory
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+from lib.riot_api import RiotAPIClient
 import json
 
-DEV_API_KEY = "####"
+DEV_API_KEY = "###"
 
 summoner_name = "duncanista"
 summoner_tagline = "LAN"
@@ -14,8 +20,8 @@ def main() -> None:
         match_data = client.get_match(match)
 
         # save match data to json file
-        with open("match_data.json", "w") as f:
-            json.dump(match_data, f)
+        with open("tests/get_matches/matches.json", "w") as f:
+            json.dump(match_data, f, indent=4)
 
         # print(match_data)
         break

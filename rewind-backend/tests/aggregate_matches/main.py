@@ -7,12 +7,14 @@ It will then send the JSON object to a DynamoDB table.
 import json
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from common.fetch_api import RiotAPIClient
-from aggregator.aggregator import MatchDataAggregator
+# Import library from root directory
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-DEV_API_KEY = "####"
+from lib.riot_api import RiotAPIClient
+from lib.match_data_aggregator import MatchDataAggregator
+
+DEV_API_KEY = "###"
 
 summoner_name = "duncanista"
 summoner_tagline = "LAN"
@@ -33,8 +35,8 @@ def main() -> None:
     aggregator = MatchDataAggregator(puuid, match_data_list)
 
     # write to file
-    with open("aggregated_data.json", "w") as f:
-        json.dump(aggregator.aggregated_data, f)
+    with open("tests/aggregate_matches/aggregated_data.json", "w") as f:
+        json.dump(aggregator.aggregated_data, f, indent=4)
 
 
 if __name__ == "__main__":
