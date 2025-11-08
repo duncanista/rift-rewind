@@ -20,6 +20,9 @@ export class RewindInfraStack extends cdk.Stack {
     // Set up Amplify hosting
     this.setupAmplify();
 
+    // Create a new S3 bucket for the user data
+
+
     // Set up Lambda and Secrets Manager
     this.setupLambda();
   }
@@ -85,16 +88,20 @@ export class RewindInfraStack extends cdk.Stack {
 
     // Create Lambda function for match data aggregation
     // Bundle Python dependencies with the Lambda code
+    const backendPath = path.join(__dirname, '..', '..', 'rewind-backend');
     const aggregatorLambda = new lambda.Function(this, `${prefix}-aggregator-${environment}`, {
       functionName: `${prefix}-aggregator-${environment}`,
       runtime: lambda.Runtime.PYTHON_3_12,
       handler: 'aggregator.handler.lambda_handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, '..', '..', 'rewind-backend', 'lambdas'), {
+      code: lambda.Code.fromAsset(backendPath, {
         bundling: {
           image: lambda.Runtime.PYTHON_3_12.bundlingImage,
           command: [
             'bash', '-c',
-            'pip install -r requirements.txt -t /asset-output && cp -au . /asset-output'
+            'cd lambdas && pip install -r requirements.txt -t /asset-output && cp -au . /asset-output && cp -au ../lib /asset-output',
+            // Remove unused files
+            'rm -rf /asset-output/tests/*',
+            'rm -rf /asset-output/README.md',
           ],
         },
       }),
