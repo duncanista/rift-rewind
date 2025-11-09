@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 
 const prefix = 'rift-rewind';
@@ -79,6 +80,16 @@ export class RewindInfraStack extends cdk.Stack {
       throw new Error('RIOT_API_KEY environment variable is not set');
     }
 
+    // Create S3 bucket for caching match data and aggregate results
+    const storageBucket = new s3.Bucket(this, `${prefix}-storage-${environment}`, {
+      bucketName: `${prefix}-storage-${environment}`,
+      // No lifecycle rules - keep data forever
+      versioned: false,
+      // Automatically delete objects when bucket is destroyed (for dev environment)
+      removalPolicy: environment === 'dev' ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+      autoDeleteObjects: environment === 'dev',
+    });
+
     // Create Secrets Manager secret for Riot API key
     const riotApiKeySecret = new secretsmanager.Secret(this, `${prefix}-riot-api-key-${environment}`, {
       secretName: `${prefix}/riot-api-key/${environment}`,
@@ -105,16 +116,20 @@ export class RewindInfraStack extends cdk.Stack {
           ],
         },
       }),
-      timeout: cdk.Duration.seconds(30),
-      memorySize: 512,
+      timeout: cdk.Duration.seconds(60), // Increased timeout for S3 operations
+      memorySize: 1024, // Increased memory for better performance
       environment: {
         RIOT_API_KEY_SECRET_ARN: riotApiKeySecret.secretArn,
+        STORAGE_BUCKET_NAME: storageBucket.bucketName,
       },
-      description: 'Aggregates League of Legends match data for a summoner',
+      description: 'Single lambda that fetches, caches, and aggregates League of Legends match data',
     });
 
     // Grant Lambda permission to read the secret
     riotApiKeySecret.grantRead(aggregatorLambda);
+
+    // Grant Lambda permission to read/write to S3 bucket
+    storageBucket.grantReadWrite(aggregatorLambda);
 
     // Create Lambda Function URL with CORS
     // Include localhost for development/testing
@@ -147,5 +162,11 @@ export class RewindInfraStack extends cdk.Stack {
       value: riotApiKeySecret.secretArn,
       description: 'Riot API Key Secret ARN',
     });
+
+    new cdk.CfnOutput(this, `${prefix}-storage-bucket-name`, {
+      value: storageBucket.bucketName,
+      description: 'S3 Storage Bucket Name',
+    });
   }
+
 }

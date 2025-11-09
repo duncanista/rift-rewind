@@ -1,20 +1,36 @@
 '''
 AWS Lambda handler for aggregating match data.
-This lambda will receive an event with summoner name and tagline,
-fetch match data from Riot API, aggregate it, and return the result.
+This single lambda handles the entire flow:
+1. Receives summoner name and tagline
+2. Checks S3 for cached aggregate data
+3. If not found or pending, fetches matches (using S3 cache for individual matches)
+4. Aggregates data and stores in S3
+5. Returns the aggregated result
 '''
 
 import json
 import os
+import sys
+import time
+from pathlib import Path
 from typing import Dict, Any
 import boto3
 from botocore.exceptions import ClientError
 
+# Add parent directories to path to import from lib
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from lib.riot_api import RiotAPIClient
 from lib.match_data_aggregator import MatchDataAggregator
+from lambdas.common.blob_storage import DataStore
 
 # Cache for API key to avoid multiple Secrets Manager calls
 _api_key_cache = None
+
+# Retry configuration for pending status
+MAX_PENDING_RETRIES = 3
+PENDING_RETRY_DELAY = 2  # seconds
 
 
 def get_api_key_from_secrets_manager(secret_arn: str) -> str:
@@ -78,6 +94,12 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     - Query parameters: ?summoner=name%23tagline&region=kr
     - POST body: {"summoner": "name#tagline", "region": "kr"}
     
+    Flow:
+    1. Check S3 for cached aggregate data
+    2. If found and status=done, return it
+    3. If found and status=pending, retry with delay
+    4. If not found, create pending entry, fetch data, aggregate, store, and return
+    
     Returns aggregated match data as JSON.
     """
     try:
@@ -95,6 +117,15 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 500,
                 'body': json.dumps({'error': f'Failed to retrieve API key from Secrets Manager: {str(e)}'})
+            }
+        
+        # Initialize DataStore for S3 caching
+        try:
+            data_store = DataStore()
+        except Exception as e:
+            return {
+                'statusCode': 500,
+                'body': json.dumps({'error': f'Failed to initialize data store: {str(e)}'})
             }
         
         # Parse the event to get summoner name, tagline, and region
@@ -139,12 +170,12 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         # Default to 'americas' if no region specified
         if not region:
             region = 'americas'
-            print(f"No region specified, defaulting to 'americas'")
+            print("No region specified, defaulting to 'americas'")
         
         print(f"Processing request for summoner: {summoner_name}#{summoner_tagline}, region: {region}")
         
-        # Initialize Riot API client with region
-        client = RiotAPIClient(api_key, region=region)
+        # Initialize Riot API client with region and data store
+        client = RiotAPIClient(api_key, region=region, data_store=data_store)
         
         # Get PUUID for the summoner
         try:
@@ -160,6 +191,56 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'body': json.dumps({'error': f'Failed to fetch account data: {str(e)}'})
             }
         
+        print(f"Found PUUID: {puuid}")
+        
+        # Check if we have cached aggregate data
+        found, is_complete, cached_data = data_store.get_aggregate_data(puuid)
+        
+        if found and is_complete:
+            print(f"Returning cached complete data for {puuid}")
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json'
+                },
+                'body': json.dumps(cached_data)
+            }
+        
+        if found and not is_complete:
+            # Data is pending, wait and retry a few times
+            print(f"Found pending data for {puuid}, will retry")
+            for retry in range(MAX_PENDING_RETRIES):
+                time.sleep(PENDING_RETRY_DELAY)
+                found, is_complete, cached_data = data_store.get_aggregate_data(puuid)
+                if is_complete:
+                    print(f"Data became ready after {retry + 1} retries")
+                    return {
+                        'statusCode': 200,
+                        'headers': {
+                            'Content-Type': 'application/json'
+                        },
+                        'body': json.dumps(cached_data)
+                    }
+            
+            # Still pending after retries, proceed to recalculate
+            print(f"Data still pending after {MAX_PENDING_RETRIES} retries, recalculating")
+        
+        # No cached data or still pending, we need to fetch and aggregate
+        print(f"No complete cached data found for {puuid}, fetching from API")
+        
+        # Create a pending entry in S3
+        pending_data = {
+            'status': 'pending',
+            'summoner': f'{summoner_name}#{summoner_tagline}',
+            'region': region,
+            'puuid': puuid
+        }
+        try:
+            data_store.set_aggregate_data(puuid, pending_data)
+            print(f"Created pending entry for {puuid}")
+        except Exception as e:
+            print(f"Warning: Failed to create pending entry: {str(e)}")
+        
         # Fetch last 10 ranked matches
         try:
             matches = client.get_matches(puuid, count=10)
@@ -171,20 +252,26 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         # Check if player has any ranked matches
         if not matches:
+            # Store result with no matches
+            no_matches_data = {
+                'status': 'done',
+                'message': f'No ranked matches found for {summoner_name}#{summoner_tagline}',
+                'summoner': f'{summoner_name}#{summoner_tagline}',
+                'region': region,
+                'puuid': puuid,
+                'matches_found': 0
+            }
+            data_store.set_aggregate_data(puuid, no_matches_data)
+            
             return {
                 'statusCode': 200,
                 'headers': {
                     'Content-Type': 'application/json'
                 },
-                'body': json.dumps({
-                    'message': f'No ranked matches found for {summoner_name}#{summoner_tagline}',
-                    'summoner': f'{summoner_name}#{summoner_tagline}',
-                    'region': region,
-                    'matches_found': 0
-                })
+                'body': json.dumps(no_matches_data)
             }
         
-        # Fetch detailed data for each match
+        # Fetch detailed data for each match (will use S3 cache automatically)
         match_data_list = []
         for match in matches:
             try:
@@ -204,6 +291,20 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         # Aggregate the match data
         aggregator = MatchDataAggregator(puuid, match_data_list)
+        aggregated_result = aggregator.aggregated_data
+        
+        # Add metadata
+        aggregated_result['status'] = 'done'
+        aggregated_result['summoner'] = f'{summoner_name}#{summoner_tagline}'
+        aggregated_result['region'] = region
+        aggregated_result['puuid'] = puuid
+        
+        # Store the aggregated result in S3
+        try:
+            data_store.set_aggregate_data(puuid, aggregated_result)
+            print(f"Stored aggregated data for {puuid}")
+        except Exception as e:
+            print(f"Warning: Failed to store aggregated data: {str(e)}")
         
         # Return the aggregated data
         # Note: CORS headers are handled by Lambda Function URL configuration
@@ -212,7 +313,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'headers': {
                 'Content-Type': 'application/json'
             },
-            'body': json.dumps(aggregator.aggregated_data)
+            'body': json.dumps(aggregated_result)
         }
         
     except Exception as e:
