@@ -8,6 +8,7 @@ interface SummaryStats {
   kdaRatio: string;
   championsPlayed: number;
   totalDeaths: number;
+  totalGames: number;
   topRoles: Array<{ name: string; icon: string; games?: number; percentage?: number }>;
   ffCount: number;
   ffText?: string;
@@ -34,13 +35,20 @@ export default function SummaryScene({ stats, uid, onShareToTwitter }: SummarySc
         
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-2.5 md:gap-4 mb-3 sm:mb-4 md:mb-6">
+          {/* Total Games */}
+          <div className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-3 sm:p-3.5 md:p-4 lg:p-5 border border-white/20 shadow-xl">
+            <div className="text-gray-400 text-xs sm:text-sm md:text-base mb-1 sm:mb-1.5 md:mb-2">Total Games</div>
+            <div className="text-white text-2xl sm:text-3xl md:text-4xl font-bold">{stats.totalGames}</div>
+            <div className="text-gray-500 text-xs sm:text-sm md:text-base mt-0.5 sm:mt-1">ranked games played</div>
+          </div>
+
           {/* KDA Stat */}
           <div className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-3 sm:p-3.5 md:p-4 lg:p-5 border border-white/20 shadow-xl">
             <div className="text-gray-400 text-xs sm:text-sm md:text-base mb-1 sm:mb-1.5 md:mb-2">Your Average KDA</div>
-            <div className="text-white text-xl sm:text-2xl md:text-3xl font-bold">
+            <div className="text-sky-400 text-2xl sm:text-3xl md:text-4xl font-bold">{stats.kdaRatio} KDA</div>
+            <div className="text-white text-base sm:text-lg md:text-xl font-semibold mt-0.5 sm:mt-1">
               {stats.kda.kills}/{stats.kda.deaths}/{stats.kda.assists}
             </div>
-            <div className="text-sky-400 text-base sm:text-lg md:text-xl font-semibold mt-0.5 sm:mt-1">{stats.kdaRatio} KDA</div>
           </div>
 
           {/* Champions Played */}

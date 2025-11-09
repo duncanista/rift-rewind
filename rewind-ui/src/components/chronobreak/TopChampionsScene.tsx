@@ -10,9 +10,10 @@ interface Champion {
 
 interface TopChampionsSceneProps {
   champions: Champion[];
+  totalGames?: number;
 }
 
-export default function TopChampionsScene({ champions }: TopChampionsSceneProps) {
+export default function TopChampionsScene({ champions, totalGames }: TopChampionsSceneProps) {
   return (
     <div className="fixed inset-0 z-[9998] flex items-center justify-center pointer-events-none">
       <div className="w-full max-w-4xl px-4 animate-fadeIn">
@@ -21,7 +22,7 @@ export default function TopChampionsScene({ champions }: TopChampionsSceneProps)
           YOUR TOP 5 CHAMPIONS
         </h2>
         <p className="text-gray-300 text-lg md:text-xl text-center mb-8 md:mb-12">
-          In your last 10 games
+          In your last {totalGames || 10} games
         </p>
 
         {/* Champions List */}
