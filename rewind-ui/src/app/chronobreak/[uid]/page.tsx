@@ -156,8 +156,8 @@ function ProcessingStatus() {
             <p 
               className={`text-white text-lg md:text-xl font-medium text-center transition-all duration-600 ${
                 isTransitioning 
-                  ? 'opacity-0 transform translate-y-2' 
-                  : 'opacity-100 transform translate-y-0'
+                  ? "opacity-0 transform translate-y-2" 
+                  : "opacity-100 transform translate-y-0"
               }`}
             >
               {messages[messageIndex]}
