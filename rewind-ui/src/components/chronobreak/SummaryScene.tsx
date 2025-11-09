@@ -12,6 +12,13 @@ interface SummaryStats {
   topRoles: Array<{ name: string; icon: string; games?: number; percentage?: number }>;
   ffCount: number;
   ffText?: string;
+  favoriteChampion?: {
+    name: string;
+    games: number;
+    winRate: number;
+    icon: string;
+  };
+  csPerMinute?: number;
 }
 
 interface SummarySceneProps {
@@ -24,72 +31,79 @@ interface SummarySceneProps {
 export default function SummaryScene({ stats, uid, onShareToTwitter }: SummarySceneProps) {
   return (
     <div className="fixed inset-0 z-[9998] flex items-center justify-center pointer-events-none px-3 pt-20 sm:pt-24 md:pt-0">
-      <div className="w-full max-w-3xl text-center animate-fadeIn pointer-events-auto">
+      <div className="w-full max-w-2xl md:max-w-3xl text-center animate-fadeIn pointer-events-auto">
         {/* Summary Title */}
         <h2 
-          className="text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3 sm:mb-4 md:mb-6"
+          className="text-white text-xl sm:text-2xl md:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4 md:mb-5"
           style={{ fontFamily: "var(--font-zalando-sans, \"Zalando Sans Expanded\", sans-serif)" }}
         >
-          YOUR 2024 RIFT REWIND
+          YOUR 2025 RIFT REWIND
         </h2>
         
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-2.5 md:gap-4 mb-3 sm:mb-4 md:mb-6">
-          {/* Total Games */}
-          <div className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-3 sm:p-3.5 md:p-4 lg:p-5 border border-white/20 shadow-xl">
-            <div className="text-gray-400 text-xs sm:text-sm md:text-base mb-1 sm:mb-1.5 md:mb-2">Total Games</div>
-            <div className="text-white text-2xl sm:text-3xl md:text-4xl font-bold">{stats.totalGames}</div>
-            <div className="text-gray-500 text-xs sm:text-sm md:text-base mt-0.5 sm:mt-1">ranked games played</div>
+        {/* Stats Grid - Mobile: 2 columns, Desktop: 2 columns */}
+        <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:gap-3 mb-3 sm:mb-4 md:mb-5">
+          {/* Row 1: Total Games & Champions Played */}
+          <div className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-3 md:p-3.5 border border-white/20 shadow-xl">
+            <div className="text-gray-400 text-xs sm:text-sm md:text-sm mb-1 sm:mb-1.5">Total Games</div>
+            <div className="text-white text-2xl sm:text-3xl md:text-3xl font-bold">{stats.totalGames}</div>
+            <div className="text-gray-500 text-xs sm:text-sm md:text-sm mt-0.5 sm:mt-1">ranked games played</div>
           </div>
 
-          {/* KDA Stat */}
-          <div className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-3 sm:p-3.5 md:p-4 lg:p-5 border border-white/20 shadow-xl">
-            <div className="text-gray-400 text-xs sm:text-sm md:text-base mb-1 sm:mb-1.5 md:mb-2">Your Average KDA</div>
-            <div className="text-sky-400 text-2xl sm:text-3xl md:text-4xl font-bold">{stats.kdaRatio} KDA</div>
-            <div className="text-white text-base sm:text-lg md:text-xl font-semibold mt-0.5 sm:mt-1">
+          <div className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-3 md:p-3.5 border border-white/20 shadow-xl">
+            <div className="text-gray-400 text-xs sm:text-sm md:text-sm mb-1 sm:mb-1.5">Champions Played</div>
+            <div className="text-white text-2xl sm:text-3xl md:text-3xl font-bold">{stats.championsPlayed}</div>
+            <div className="text-gray-500 text-xs sm:text-sm md:text-sm mt-0.5 sm:mt-1">unique champions</div>
+          </div>
+
+          {/* Row 2: Favorite Champion - Full width */}
+          {stats.favoriteChampion && (
+            <div className="col-span-2 bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-3 md:p-3.5 border border-white/20 shadow-xl">
+              <div className="text-gray-400 text-xs sm:text-sm md:text-sm mb-1 sm:mb-1.5">Favorite Champion</div>
+              <div className="flex items-center justify-center gap-2 sm:gap-3 my-1 sm:my-1.5">
+                <Image
+                  src={stats.favoriteChampion.icon}
+                  alt={stats.favoriteChampion.name}
+                  width={48}
+                  height={48}
+                  className="w-10 h-10 sm:w-12 sm:h-12 md:w-12 md:h-12 rounded-lg border-2 border-white/30"
+                />
+                <div className="text-left">
+                  <div className="text-white text-base sm:text-lg md:text-lg font-bold">{stats.favoriteChampion.name}</div>
+                  <div className="text-gray-300 text-xs sm:text-sm md:text-sm">{stats.favoriteChampion.games} games</div>
+                </div>
+              </div>
+              <div className="text-green-400 text-xs sm:text-sm md:text-sm mt-0.5 sm:mt-1">{stats.favoriteChampion.winRate}% win rate</div>
+            </div>
+          )}
+
+          {/* Row 3: KDA & Total Deaths */}
+          <div className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-3 md:p-3.5 border border-white/20 shadow-xl">
+            <div className="text-gray-400 text-xs sm:text-sm md:text-sm mb-1 sm:mb-1.5">Your Average KDA</div>
+            <div className="text-sky-400 text-2xl sm:text-3xl md:text-3xl font-bold">{stats.kdaRatio}</div>
+            <div className="text-white text-sm sm:text-base md:text-base font-semibold mt-0.5 sm:mt-1">
               {stats.kda.kills}/{stats.kda.deaths}/{stats.kda.assists}
             </div>
           </div>
 
-          {/* Champions Played */}
-          <div className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-3 sm:p-3.5 md:p-4 lg:p-5 border border-white/20 shadow-xl">
-            <div className="text-gray-400 text-xs sm:text-sm md:text-base mb-1 sm:mb-1.5 md:mb-2">Champions Played</div>
-            <div className="text-white text-2xl sm:text-3xl md:text-4xl font-bold">{stats.championsPlayed}</div>
-            <div className="text-gray-500 text-xs sm:text-sm md:text-base mt-0.5 sm:mt-1">unique champions</div>
+          <div className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-3 md:p-3.5 border border-white/20 shadow-xl">
+            <div className="text-gray-400 text-xs sm:text-sm md:text-sm mb-1 sm:mb-1.5">Total Deaths</div>
+            <div className="text-white text-2xl sm:text-3xl md:text-3xl font-bold">{stats.totalDeaths}</div>
+            <div className="text-red-400 text-xs sm:text-sm md:text-sm mt-0.5 sm:mt-1">times respawning</div>
           </div>
 
-          {/* Deaths */}
-          <div className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-3 sm:p-3.5 md:p-4 lg:p-5 border border-white/20 shadow-xl">
-            <div className="text-gray-400 text-xs sm:text-sm md:text-base mb-1 sm:mb-1.5 md:mb-2">Total Deaths</div>
-            <div className="text-white text-2xl sm:text-3xl md:text-4xl font-bold">{stats.totalDeaths}</div>
-            <div className="text-red-400 text-xs sm:text-sm md:text-base mt-0.5 sm:mt-1">times respawning</div>
-          </div>
-
-          {/* Top Roles */}
-          <div className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-3 sm:p-3.5 md:p-4 lg:p-5 border border-white/20 shadow-xl">
-            <div className="text-gray-400 text-xs sm:text-sm md:text-base mb-1 sm:mb-1.5 md:mb-2">Favorite Roles</div>
-            <div className="flex items-center justify-center gap-2 sm:gap-3 my-1 sm:my-2">
-              {stats.topRoles.map((role) => (
-                <div key={role.name} className="flex items-center gap-1 sm:gap-2">
-                  <Image
-                    src={role.icon}
-                    alt={role.name}
-                    width={32}
-                    height={32}
-                    className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 opacity-90"
-                  />
-                  <span className="text-white text-base sm:text-lg md:text-xl font-bold">{role.name}</span>
-                </div>
-              ))}
+          {/* Row 4: CS Per Minute & Surrenders */}
+          {stats.csPerMinute !== undefined && (
+            <div className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-3 md:p-3.5 border border-white/20 shadow-xl">
+              <div className="text-gray-400 text-xs sm:text-sm md:text-sm mb-1 sm:mb-1.5">CS Per Minute</div>
+              <div className="text-white text-2xl sm:text-3xl md:text-3xl font-bold">{stats.csPerMinute}</div>
+              <div className="text-purple-400 text-xs sm:text-sm md:text-sm mt-0.5 sm:mt-1">average farming</div>
             </div>
-            <div className="text-gray-500 text-xs sm:text-sm md:text-base mt-0.5 sm:mt-1">most played</div>
-          </div>
+          )}
 
-          {/* FF Count - Full width */}
-          <div className="md:col-span-2 bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-3 sm:p-3.5 md:p-4 lg:p-5 border border-white/20 shadow-xl">
-            <div className="text-gray-400 text-xs sm:text-sm md:text-base mb-1 sm:mb-1.5 md:mb-2">Surrenders</div>
-            <div className="text-white text-2xl sm:text-3xl md:text-4xl font-bold">{stats.ffCount}</div>
-            <div className={`text-xs sm:text-sm md:text-base mt-0.5 sm:mt-1 ${stats.ffCount === 0 || (stats.ffText && stats.ffText.includes("never gave up")) ? "text-green-400" : "text-yellow-400"}`}>
+          <div className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-3 md:p-3.5 border border-white/20 shadow-xl">
+            <div className="text-gray-400 text-xs sm:text-sm md:text-sm mb-1 sm:mb-1.5">Surrenders</div>
+            <div className="text-white text-2xl sm:text-3xl md:text-3xl font-bold">{stats.ffCount}</div>
+            <div className={`text-xs sm:text-sm md:text-sm mt-0.5 sm:mt-1 ${stats.ffCount === 0 || (stats.ffText && stats.ffText.includes("never gave up")) ? "text-green-400" : "text-yellow-400"}`}>
               {stats.ffText || "times you said \"gg go next\""}
             </div>
           </div>

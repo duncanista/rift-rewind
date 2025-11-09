@@ -22,6 +22,47 @@ import {
 const CHECK_USER_STATUS_URL = "https://nbmemmnatn3kxri3sf7yccqn5e0uxglu.lambda-url.us-east-1.on.aws/";
 
 // Type for aggregated data from backend
+interface ChampionStats {
+  games: number;
+  wins: number;
+  losses: number;
+  kills: number;
+  deaths: number;
+  assists: number;
+  cs: number;
+  vision_score: number;
+  duration: number;
+  win_rate?: number;
+  avg_kills?: number;
+  avg_deaths?: number;
+  avg_assists?: number;
+  avg_cs?: number;
+  avg_vision_score?: number;
+  cs_per_minute?: number;
+  vision_per_minute?: number;
+}
+
+interface PerformanceMetrics {
+  cs_per_minute: number;
+  vision_per_minute: number;
+  avg_kills: number;
+  avg_deaths: number;
+  avg_assists: number;
+  avg_cs: number;
+  avg_vision_score: number;
+  avg_game_duration: number;
+}
+
+interface MatchPerformance {
+  match_id: string;
+  champion: string;
+  kda: string;
+  kda_ratio: number;
+  cs: number;
+  vision_score: number;
+  won: boolean;
+}
+
 interface AggregatedData {
   pings: {
     allInPings: number;
@@ -58,6 +99,11 @@ interface AggregatedData {
     BOTTOM: number;
     UTILITY: number;
   };
+  // Enhanced stats
+  champion_stats?: Record<string, ChampionStats>;
+  performance_metrics?: PerformanceMetrics;
+  best_match?: MatchPerformance;
+  worst_match?: MatchPerformance;
 }
 
 // No mock data - we only show real data
@@ -259,6 +305,10 @@ export default function ChronobreakPage() {
   const uniqueChampionsCount = dataToUse ? Object.keys(dataToUse.champions).length : 0;
   const surrenderPercentage = dataToUse && totalGames > 0 ? (dataToUse.early_surrender / totalGames) * 100 : 0;
   
+  // Get favorite champion with win rate from enhanced champion_stats
+  const favoriteChampionWithStats = dataToUse?.champion_stats && favoriteChampionEntry ? 
+    dataToUse.champion_stats[favoriteChampionEntry[0]] : null;
+  
   const summaryStats = {
     kda: { 
       kills: dataToUse?.kills || 0, 
@@ -272,6 +322,13 @@ export default function ChronobreakPage() {
     topRoles: top2Roles,
     ffCount: dataToUse?.early_surrender || 0,
     ffText: surrenderPercentage < 5 ? "you never gave up!" : "times you said \"gg go next\"",
+    favoriteChampion: favoriteChampionEntry && favoriteChampionWithStats ? {
+      name: favoriteChampionEntry[0],
+      games: favoriteChampionEntry[1],
+      winRate: favoriteChampionWithStats.win_rate || 0,
+      icon: `https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/${favoriteChampionEntry[0]}.png`,
+    } : undefined,
+    csPerMinute: dataToUse?.performance_metrics?.cs_per_minute,
   };
 
   // Redirect to home if no uid is provided
@@ -597,12 +654,22 @@ export default function ChronobreakPage() {
           
           {aggregatedData && (
             <>
-              <p className="text-gray-400 text-base sm:text-lg md:text-xl mb-6 md:mb-8 px-4">
-                Your data is ready!
-              </p>
+              {/* Data Ready Message with Gold Accents */}
+              <div className="flex items-center justify-center space-x-4 mb-6 md:mb-8">
+                <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-yellow-500"></div>
+                <p className="text-xl sm:text-2xl md:text-2xl text-white font-semibold uppercase tracking-wider">
+                  Your Data is Ready!
+                </p>
+                <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-yellow-500"></div>
+              </div>
+              
+              {/* Blue Button with Gold Glowing Borders */}
               <button
                 onClick={handleButtonClick}
-                className="font-bold py-4 px-8 rounded-xl text-lg md:text-xl transition-all duration-300 shadow-lg bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 transform hover:scale-105 hover:shadow-sky-500/50 text-white"
+                className="relative font-bold py-5 px-10 sm:py-6 sm:px-12 rounded-2xl text-xl sm:text-2xl md:text-2xl transition-all duration-300 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 transform hover:scale-110 text-white shadow-2xl border-2 border-yellow-500/50 hover:border-yellow-400 hover:shadow-yellow-500/50"
+                style={{
+                  boxShadow: "0 0 30px rgba(234, 179, 8, 0.5), 0 0 60px rgba(59, 130, 246, 0.3)",
+                }}
               >
                 View Your Rewind
               </button>
