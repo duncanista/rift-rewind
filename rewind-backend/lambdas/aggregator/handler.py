@@ -12,62 +12,7 @@ from botocore.exceptions import ClientError
 
 from lib.riot_api import RiotAPIClient
 from lib.match_data_aggregator import MatchDataAggregator
-
-# Cache for API key to avoid multiple Secrets Manager calls
-_api_key_cache = None
-
-
-def get_api_key_from_secrets_manager(secret_arn: str) -> str:
-    """
-    Retrieve API key from AWS Secrets Manager.
-    
-    Args:
-        secret_arn: The ARN of the secret in Secrets Manager
-        
-    Returns:
-        The API key string
-        
-    Raises:
-        ClientError: If unable to retrieve the secret
-    """
-    global _api_key_cache
-    
-    # Return cached value if available
-    if _api_key_cache:
-        return _api_key_cache
-    
-    # Create a Secrets Manager client
-    session = boto3.session.Session()
-    client = session.client(service_name='secretsmanager')
-    
-    try:
-        get_secret_value_response = client.get_secret_value(SecretId=secret_arn)
-    except ClientError as e:
-        raise Exception(f"Failed to retrieve secret: {str(e)}")
-    
-    # Parse the secret value
-    if 'SecretString' in get_secret_value_response:
-        secret = get_secret_value_response['SecretString']
-        # If it's a JSON string with a key, parse it
-        try:
-            secret_dict = json.loads(secret)
-            # Assume the key is stored with key "api_key" or "RIOT_API_KEY"
-            api_key = secret_dict.get('api_key') or secret_dict.get('RIOT_API_KEY')
-            if not api_key:
-                # If no specific key, try to use the first value
-                api_key = list(secret_dict.values())[0] if secret_dict else None
-        except json.JSONDecodeError:
-            # If it's not JSON, use the raw string
-            api_key = secret
-    else:
-        raise Exception("Secret does not contain a string value")
-    
-    if not api_key:
-        raise Exception("API key not found in secret")
-    
-    # Cache the API key for subsequent invocations
-    _api_key_cache = api_key
-    return api_key
+from lib.aws_utils import get_secret_from_secrets_manager
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -90,7 +35,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         try:
-            api_key = get_api_key_from_secrets_manager(secret_arn)
+            api_key = get_secret_from_secrets_manager(secret_arn)
         except Exception as e:
             return {
                 'statusCode': 500,

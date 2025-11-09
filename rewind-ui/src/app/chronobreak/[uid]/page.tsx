@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import { 
   FavoriteChampionScene,
   HoursPlayedScene,
+  WinLossScene,
   TopChampionsScene, 
   TopRolesScene,
   Top2RolesScene, 
@@ -17,8 +18,8 @@ import {
   StoryProgressBar, 
 } from "@/components/chronobreak";
 
-// Lambda Function URL
-const LAMBDA_FUNCTION_URL = "https://4yry7prgvpiu6gralibuy5aepa0czkqp.lambda-url.us-east-1.on.aws/";
+// Lambda Function URL - Check User Status endpoint
+const CHECK_USER_STATUS_URL = "https://nbmemmnatn3kxri3sf7yccqn5e0uxglu.lambda-url.us-east-1.on.aws/";
 
 // Type for aggregated data from backend
 interface AggregatedData {
@@ -59,52 +60,10 @@ interface AggregatedData {
   };
 }
 
-// Mock aggregated data from backend (fallback)
-const MOCK_AGGREGATED_DATA: AggregatedData = {
-  pings: {
-    allInPings: 2,
-    assistMePings: 41,
-    basicPings: 0,
-    commandPings: 150,
-    dangerPings: 0,
-    enemyMissingPings: 88,
-    enemyVisionPings: 113,
-    getBackPings: 41,
-    holdPings: 0,
-    needVisionPings: 17,
-    onMyWayPings: 346,
-    pushPings: 16,
-    visionClearedPings: 0,
-  },
-  kills: 43,
-  deaths: 63,
-  assists: 96,
-  cs: 1513,
-  vision_score: 217,
-  wards_placed: 106,
-  wards_killed: 26,
-  early_surrender: 0,
-  first_blood: 4,
-  match_duration: 17192,
-  won: 8,
-  lost: 2,
-  champions: {
-    Morgana: 7,
-    Qiyana: 1,
-    Lux: 1,
-    Mordekaiser: 1,
-  },
-  positions: {
-    TOP: 1,
-    JUNGLE: 0,
-    MIDDLE: 9,
-    BOTTOM: 0,
-    UTILITY: 0,
-  },
-};
+// No mock data - we only show real data
 
 // Animation scene configuration
-type AnimationScene = "idle" | "favorite" | "hours" | "scene1" | "roles" | "top2roles" | "summary";
+type AnimationScene = "idle" | "favorite" | "hours" | "winloss" | "scene1" | "roles" | "top2roles" | "summary";
 
 // Helper function to map API position names to UI display names
 function mapPositionName(position: string): string {
@@ -130,6 +89,91 @@ function getPositionIcon(position: string): string {
   return iconMapping[position] || "/images/position/mid.svg";
 }
 
+// Processing status component with rotating messages
+function ProcessingStatus() {
+  const [messageIndex, setMessageIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const messages = [
+    "Analyzing your matches...",
+    "Counting how many wards you placed",
+    "Watching you die over and over",
+    "Verifying Teemo plays...",
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Start fade out
+      setIsTransitioning(true);
+      
+      // After fade out completes, change message and fade in
+      setTimeout(() => {
+        setMessageIndex((prev) => (prev + 1) % messages.length);
+        setIsTransitioning(false);
+      }, 300); // Half of the transition duration
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [messages.length]);
+
+  return (
+    <div className="space-y-6 max-w-2xl mx-auto">
+      {/* Styled warning box similar to legal page */}
+      <div className="flex items-center justify-center space-x-4 mb-6">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent to-yellow-500"></div>
+        <p className="text-xl md:text-2xl text-yellow-400 font-semibold uppercase tracking-wider">
+          Processing Your Data
+        </p>
+        <div className="h-px w-16 bg-gradient-to-l from-transparent to-yellow-500"></div>
+      </div>
+
+      {/* Rotating message with spinner */}
+      <div className="bg-black/30 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-yellow-500/30">
+        <div className="flex flex-col items-center space-y-4">
+          {/* Spinner */}
+          <svg 
+            className="animate-spin h-12 w-12 text-yellow-400" 
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24"
+          >
+            <circle 
+              className="opacity-25" 
+              cx="12" 
+              cy="12" 
+              r="10" 
+              stroke="currentColor" 
+              strokeWidth="4"
+            ></circle>
+            <path 
+              className="opacity-75" 
+              fill="currentColor" 
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+
+          {/* Rotating message with smooth fade animation */}
+          <div className="min-h-[2rem] flex items-center justify-center">
+            <p 
+              className={`text-white text-lg md:text-xl font-medium text-center transition-all duration-600 ${
+                isTransitioning 
+                  ? "opacity-0 transform translate-y-2" 
+                  : "opacity-100 transform translate-y-0"
+              }`}
+            >
+              {messages[messageIndex]}
+            </p>
+          </div>
+
+          {/* Subtitle */}
+          <p className="text-gray-400 text-sm md:text-base text-center">
+            Please come back in a couple minutes, our servers are busy processing your montages
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ChronobreakPage() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -150,6 +194,7 @@ export default function ChronobreakPage() {
   const [showRectangles, setShowRectangles] = useState(false);
   const [showFavorite, setShowFavorite] = useState(false);
   const [showHours, setShowHours] = useState(false);
+  const [showWinLoss, setShowWinLoss] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showRoles, setShowRoles] = useState(false);
   const [showTop2Roles, setShowTop2Roles] = useState(false);
@@ -160,39 +205,39 @@ export default function ChronobreakPage() {
   // Story progress management
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [storyProgress, setStoryProgress] = useState(0);
-  const totalStories = 6; // 1 favorite champion + 1 hours played + 1 top champions scene + 1 top 2 roles scene + 1 top 5 roles scene + 1 summary scene
+  const totalStories = 7; // 1 hours + 1 favorite + 1 win/loss + 1 top champions + 1 top 2 roles + 1 top 5 roles + 1 summary
   const storyDuration = 10000; // 10 seconds per story
   
-  // Use fetched data or fallback to mock data
-  const dataToUse = aggregatedData || MOCK_AGGREGATED_DATA;
+  // Only use real fetched data - no mock fallback
+  const dataToUse = aggregatedData;
   
-  // Transform aggregated data for components
-  const totalGames = dataToUse.won + dataToUse.lost;
+  // Transform aggregated data for components (only if data exists)
+  const totalGames = dataToUse ? dataToUse.won + dataToUse.lost : 0;
   
   // Favorite (most played) champion
-  const favoriteChampionEntry = Object.entries(dataToUse.champions)
-    .sort(([, a], [, b]) => b - a)[0];
+  const favoriteChampionEntry = dataToUse ? Object.entries(dataToUse.champions)
+    .sort(([, a], [, b]) => b - a)[0] : null;
   const favoriteChampion = favoriteChampionEntry ? {
     name: favoriteChampionEntry[0],
     games: favoriteChampionEntry[1],
   } : { name: "Unknown", games: 0 };
   
   // Calculate hours played (match_duration is in seconds, convert to hours and round up)
-  const hoursPlayed = Math.ceil(dataToUse.match_duration / 3600);
+  const hoursPlayed = dataToUse ? Math.ceil(dataToUse.match_duration / 3600) : 0;
   
   // Top 5 Champions - sorted by games played
   // Using Riot Data Dragon CDN for champion images
-  const topChampions = Object.entries(dataToUse.champions)
+  const topChampions = dataToUse ? Object.entries(dataToUse.champions)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5)
     .map(([name, games]) => ({
       name,
       games,
       icon: `https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/${name}.png`,
-    }));
+    })) : [];
 
   // Top 5 Roles with percentages
-  const topRoles = Object.entries(dataToUse.positions)
+  const topRoles = dataToUse ? Object.entries(dataToUse.positions)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5)
     .filter(([, games]) => games > 0)
@@ -201,30 +246,31 @@ export default function ChronobreakPage() {
       games,
       percentage: Math.round((games / totalGames) * 100),
       icon: getPositionIcon(position),
-    }));
+    })) : [];
 
   // Top 2 Roles for separate scene and summary
   const top2Roles = topRoles.slice(0, 2);
 
   // Summary Stats
-  const kdaRatio = dataToUse.deaths > 0 
+  const kdaRatio = dataToUse && dataToUse.deaths > 0 
     ? ((dataToUse.kills + dataToUse.assists) / dataToUse.deaths).toFixed(2)
-    : ((dataToUse.kills + dataToUse.assists)).toFixed(2);
+    : dataToUse ? ((dataToUse.kills + dataToUse.assists)).toFixed(2) : "0.00";
   
-  const uniqueChampionsCount = Object.keys(dataToUse.champions).length;
-  const surrenderPercentage = (dataToUse.early_surrender / totalGames) * 100;
+  const uniqueChampionsCount = dataToUse ? Object.keys(dataToUse.champions).length : 0;
+  const surrenderPercentage = dataToUse && totalGames > 0 ? (dataToUse.early_surrender / totalGames) * 100 : 0;
   
   const summaryStats = {
     kda: { 
-      kills: dataToUse.kills, 
-      deaths: dataToUse.deaths, 
-      assists: dataToUse.assists, 
+      kills: dataToUse?.kills || 0, 
+      deaths: dataToUse?.deaths || 0, 
+      assists: dataToUse?.assists || 0, 
     },
     kdaRatio,
     championsPlayed: uniqueChampionsCount,
-    totalDeaths: dataToUse.deaths,
+    totalDeaths: dataToUse?.deaths || 0,
+    totalGames,
     topRoles: top2Roles,
-    ffCount: dataToUse.early_surrender,
+    ffCount: dataToUse?.early_surrender || 0,
     ffText: surrenderPercentage < 5 ? "you never gave up!" : "times you said \"gg go next\"",
   };
 
@@ -235,7 +281,7 @@ export default function ChronobreakPage() {
     }
   }, [uid, router]);
 
-  // Fetch aggregated data from Lambda as soon as possible
+  // Fetch aggregated data from Lambda - single check, no polling
   useEffect(() => {
     if (!uid || uid.trim() === "") return;
 
@@ -249,7 +295,7 @@ export default function ChronobreakPage() {
         
         console.log(`Fetching data for summoner: ${summonerName} in region: ${region}`);
         
-        const response = await fetch(LAMBDA_FUNCTION_URL, {
+        const response = await fetch(CHECK_USER_STATUS_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -261,22 +307,29 @@ export default function ChronobreakPage() {
         });
 
         if (response.status === 200) {
+          // Data is ready!
           const result = await response.json();
           console.log("Data fetched successfully:", result);
           setAggregatedData(result);
           setIsLoading(false);
+          setError(null);
+        } else if (response.status === 202) {
+          // Data is being processed
+          const result = await response.json();
+          console.log("Data is being processed:", result);
+          setError("Your matches are being processed! This usually takes 3-5 minutes. Come back soon to see your Rewind!");
+          setIsLoading(false);
         } else {
+          // Error occurred
           const errorData = await response.json();
           console.error("Failed to fetch data:", errorData);
           setError(errorData.error || "Failed to fetch match data");
           setIsLoading(false);
-          // Fallback to mock data
         }
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("Network error occurred");
         setIsLoading(false);
-        // Fallback to mock data
       }
     };
 
@@ -310,6 +363,7 @@ export default function ChronobreakPage() {
     // Immediately clear all scene states to prevent overlap
     setShowFavorite(false);
     setShowHours(false);
+    setShowWinLoss(false);
     setShowStats(false);
     setShowRoles(false);
     setShowTop2Roles(false);
@@ -319,8 +373,8 @@ export default function ChronobreakPage() {
     setStoryProgress(0);
     setIsAnimating(true);
     
-    // Scene sequence: hours -> favorite -> scene1 (top champions) -> top2roles (top 2) -> roles (top 5) -> summary
-    // Check if this is the summary scene (last story, index 5)
+    // Scene sequence: hours -> favorite -> winloss -> scene1 (top champions) -> top2roles (top 2) -> roles (top 5) -> summary
+    // Check if this is the summary scene (last story, index 6)
     if (index === totalStories - 1) {
       setCurrentScene("summary");
       // Use setTimeout to ensure state is cleared first
@@ -329,8 +383,8 @@ export default function ChronobreakPage() {
       }, 0);
       timeoutRefs.current.push(timeout);
     } 
-    // Check if this is the top 5 roles scene (index 4)
-    else if (index === 4) {
+    // Check if this is the top 5 roles scene (index 5)
+    else if (index === 5) {
       setCurrentScene("roles");
       // Use setTimeout to ensure state is cleared first
       const timeout = setTimeout(() => {
@@ -339,8 +393,8 @@ export default function ChronobreakPage() {
       }, 0);
       timeoutRefs.current.push(timeout);
     }
-    // Check if this is the top 2 roles scene (index 3)
-    else if (index === 3) {
+    // Check if this is the top 2 roles scene (index 4)
+    else if (index === 4) {
       setCurrentScene("top2roles");
       // Use setTimeout to ensure state is cleared first
       const timeout = setTimeout(() => {
@@ -349,8 +403,8 @@ export default function ChronobreakPage() {
       }, 0);
       timeoutRefs.current.push(timeout);
     } 
-    // Top champions scene (index 2)
-    else if (index === 2) {
+    // Top champions scene (index 3)
+    else if (index === 3) {
       setCurrentScene("scene1");
       
       // Wait 700ms for content to fade out, then show rectangles
@@ -364,6 +418,16 @@ export default function ChronobreakPage() {
         setShowStats(true);
       }, 2200);
       timeoutRefs.current.push(timeout2);
+    }
+    // Win/Loss scene (index 2)
+    else if (index === 2) {
+      setCurrentScene("winloss");
+      // Use setTimeout to ensure state is cleared first
+      const timeout = setTimeout(() => {
+        setShowRectangles(true);
+        setShowWinLoss(true);
+      }, 0);
+      timeoutRefs.current.push(timeout);
     }
     // Favorite champion scene (index 1)
     else if (index === 1) {
@@ -400,6 +464,7 @@ export default function ChronobreakPage() {
       setShowRectangles(false);
       setShowFavorite(false);
       setShowHours(false);
+      setShowWinLoss(false);
       setShowStats(false);
       setShowRoles(false);
       setShowTop2Roles(false);
@@ -524,32 +589,35 @@ export default function ChronobreakPage() {
               >
                 CHRONOBREAK
               </span>
-              <span className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl"> Activated</span>
+              <span className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
+                {!aggregatedData && !isLoading ? " Not Ready Yet" : " Activated"}
+              </span>
             </div>
           </h1>
-          <p className="text-gray-400 text-base sm:text-lg md:text-xl mb-6 md:mb-8 px-4">
-            {isLoading ? "Fetching your match data..." : error ? "Using sample data..." : "Your data is ready!"}
-          </p>
           
-          <button
-            onClick={handleButtonClick}
-            disabled={isLoading}
-            className={`font-bold py-4 px-8 rounded-xl text-lg md:text-xl transition-all duration-300 shadow-lg ${
-              isLoading 
-                ? "bg-gray-500 cursor-not-allowed opacity-50" 
-                : "bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 transform hover:scale-105 hover:shadow-sky-500/50"
-            } text-white`}
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Loading...
-              </span>
-            ) : "View Your Rewind"}
-          </button>
+          {aggregatedData && (
+            <>
+              <p className="text-gray-400 text-base sm:text-lg md:text-xl mb-6 md:mb-8 px-4">
+                Your data is ready!
+              </p>
+              <button
+                onClick={handleButtonClick}
+                className="font-bold py-4 px-8 rounded-xl text-lg md:text-xl transition-all duration-300 shadow-lg bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 transform hover:scale-105 hover:shadow-sky-500/50 text-white"
+              >
+                View Your Rewind
+              </button>
+            </>
+          )}
+          
+          {!aggregatedData && !isLoading && error && (
+            <ProcessingStatus />
+          )}
+          
+          {isLoading && (
+            <p className="text-gray-400 text-base sm:text-lg md:text-xl mb-6 md:mb-8 px-4">
+              Fetching your match data...
+            </p>
+          )}
         </div>
       </main>
       
@@ -572,8 +640,17 @@ export default function ChronobreakPage() {
       {/* Hours Played Scene */}
       {showHours && currentScene === "hours" && <HoursPlayedScene hours={hoursPlayed} />}
 
+      {/* Win/Loss Scene */}
+      {showWinLoss && currentScene === "winloss" && (
+        <WinLossScene 
+          totalGames={totalGames} 
+          wins={dataToUse?.won || 0} 
+          losses={dataToUse?.lost || 0} 
+        />
+      )}
+
       {/* Top Champions Scene */}
-      {showStats && <TopChampionsScene champions={topChampions} />}
+      {showStats && <TopChampionsScene champions={topChampions} totalGames={totalGames} />}
 
       {/* White fade out overlay - opposite of main page */}
       {showTransition && (
