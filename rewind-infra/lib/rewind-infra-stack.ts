@@ -317,7 +317,7 @@ export class RewindInfraStack extends cdk.Stack {
       runtime: lambda.Runtime.PYTHON_3_12,
       handler: 'generate_insights.handler.lambda_handler',
       code: lambdaCode,
-      timeout: cdk.Duration.seconds(30),
+      timeout: cdk.Duration.seconds(90),
       memorySize: 512,
       environment: {
         DATA_BUCKET_NAME: this.dataBucket.bucketName,
@@ -333,12 +333,15 @@ export class RewindInfraStack extends cdk.Stack {
     generateInsightsLambda.addToRolePolicy(
       new cdk.aws_iam.PolicyStatement({
         effect: cdk.aws_iam.Effect.ALLOW,
-        actions: ['bedrock:InvokeModel'],
-        resources: [
-          `arn:aws:bedrock:${this.region}::foundation-model/amazon.nova-lite-v1:0`,
-          `arn:aws:bedrock:${this.region}::foundation-model/amazon.nova-micro-v1:0`,
-          `arn:aws:bedrock:${this.region}::foundation-model/amazon.nova-pro-v1:0`,
-        ],
+        actions: ['bedrock:*'],
+        resources: ['*'],
+      })
+    );
+    generateInsightsLambda.addToRolePolicy(
+      new cdk.aws_iam.PolicyStatement({
+        effect: cdk.aws_iam.Effect.ALLOW,
+        actions: ['aws-marketplace:ViewSubscriptions'],
+        resources: ['*'],
       })
     );
 
@@ -478,11 +481,13 @@ export class RewindInfraStack extends cdk.Stack {
       runtime: lambda.Runtime.PYTHON_3_12,
       handler: 'chat.handler.lambda_handler',
       code: lambdaCode,
-      timeout: cdk.Duration.seconds(30),
+      timeout: cdk.Duration.seconds(90),
       memorySize: 512,
       environment: {
         DATA_BUCKET_NAME: this.dataBucket.bucketName,
         USER_PROCESSING_QUEUE_URL: this.userProcessingQueue.queueUrl,
+        RIOT_API_KEY_SECRET_ARN: this.riotApiKeySecret.secretArn,
+        USER_INSIGHTS_TABLE_NAME: this.userInsightsTable.tableName,
         ENVIRONMENT: environment!,
       },
       description: 'Handles chat interactions using Bedrock Converse API',
@@ -491,15 +496,20 @@ export class RewindInfraStack extends cdk.Stack {
     // Grant permissions
     this.dataBucket.grantRead(chatLambda);
     this.userProcessingQueue.grantSendMessages(chatLambda);
+    this.riotApiKeySecret.grantRead(chatLambda);
+    this.userInsightsTable.grantReadWriteData(chatLambda);
     chatLambda.addToRolePolicy(
       new cdk.aws_iam.PolicyStatement({
         effect: cdk.aws_iam.Effect.ALLOW,
-        actions: ['bedrock:InvokeModel'],
-        resources: [
-          `arn:aws:bedrock:${this.region}::foundation-model/amazon.nova-lite-v1:0`,
-          `arn:aws:bedrock:${this.region}::foundation-model/amazon.nova-micro-v1:0`,
-          `arn:aws:bedrock:${this.region}::foundation-model/amazon.nova-pro-v1:0`,
-        ],
+        actions: ['bedrock:*'],
+        resources: ['*'],
+      })
+    );
+    chatLambda.addToRolePolicy(
+      new cdk.aws_iam.PolicyStatement({
+        effect: cdk.aws_iam.Effect.ALLOW,
+        actions: ['aws-marketplace:ViewSubscriptions'],
+        resources: ['*'],
       })
     );
 
