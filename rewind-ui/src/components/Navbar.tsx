@@ -48,14 +48,12 @@ export default function Navbar() {
           >
             BLOG
           </a>
-          <a 
-            href="https://lolesports.com/" 
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link 
+            href="/chat" 
             className="text-white/70 hover:text-white text-lg font-semibold transition-colors"
           >
-            WORLDS25
-          </a>
+            AI COACH
+          </Link>
           <Link 
             href="/about" 
             className="text-white/70 hover:text-white text-lg font-semibold transition-colors"
@@ -84,12 +82,12 @@ export default function Navbar() {
           >
             <SimpleIcon path={siGithub.path} title="GitHub" className="w-5 h-5" />
           </a>
-          <button
+          {/* <button
             className="text-white/60 hover:text-white transition-colors"
             aria-label="User Profile"
           >
             <User className="w-6 h-6" />
-          </button>
+          </button> */}
         </div>
 
         {/* Mobile Menu Button with animation */}
@@ -138,15 +136,13 @@ export default function Navbar() {
           >
             BLOG
           </a>
-          <a 
-            href="https://lolesports.com/" 
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link 
+            href="/chat" 
             className="text-white/70 hover:text-white text-xl font-semibold transition-colors"
             onClick={() => setIsMenuOpen(false)}
           >
-            WORLDS25
-          </a>
+            AI COACH
+          </Link>
           <Link 
             href="/about" 
             className="text-white/70 hover:text-white text-xl font-semibold transition-colors"
@@ -175,12 +171,12 @@ export default function Navbar() {
             >
               <SimpleIcon path={siGithub.path} title="GitHub" className="w-6 h-6" />
             </a>
-            <button
+            {/* <button
               className="text-white/60 hover:text-white transition-colors"
               aria-label="User Profile"
             >
               <User className="w-7 h-7" />
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

@@ -109,8 +109,19 @@ export default function SummaryScene({ stats, uid, onShareToTwitter }: SummarySc
           </div>
         </div>
 
-        {/* Share Section */}
+        {/* Action Buttons Section */}
         <div className="flex flex-col items-center space-y-2 sm:space-y-3 mt-3 sm:mt-4 md:mt-6">
+          {/* Chat with AI Button - Primary CTA */}
+          <Link
+            href={`/chat?uid=${encodeURIComponent(uid)}&autostart=true`}
+            className="group relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 px-6 sm:py-3.5 sm:px-8 rounded-full text-sm sm:text-base md:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl hover:shadow-purple-500/50 flex items-center space-x-2 sm:space-x-3 border border-white/20 animate-breathe"
+          >
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+            <span>Chat with AI Coach</span>
+          </Link>
+
           {/* Share to X Button */}
           <button
             onClick={onShareToTwitter}
