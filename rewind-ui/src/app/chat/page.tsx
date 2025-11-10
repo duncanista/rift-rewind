@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -22,7 +22,7 @@ interface Message {
 const CHAT_URL = "https://ytnsvw2ozdgewpleglwnyvn3gy0cpvvr.lambda-url.us-east-1.on.aws";
 const CHECK_USER_STATUS_URL = "https://nbmemmnatn3kxri3sf7yccqn5e0uxglu.lambda-url.us-east-1.on.aws/";
 
-export default function ChatPage() {
+function ChatPageContent() {
   const searchParams = useSearchParams();
   const [riotId, setRiotId] = useState("");
   const [region, setRegion] = useState("na1");
@@ -447,5 +447,20 @@ export default function ChatPage() {
       
       <Footer />
     </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-white text-center">
+          <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p>Loading chat...</p>
+        </div>
+      </div>
+    }>
+      <ChatPageContent />
+    </Suspense>
   );
 }
