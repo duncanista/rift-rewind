@@ -24,11 +24,12 @@ interface SummaryStats {
 interface SummarySceneProps {
   stats: SummaryStats;
   uid: string;
+  region?: string;
   onShareToTwitter: () => void;
 }
 
-// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-export default function SummaryScene({ stats, uid, onShareToTwitter }: SummarySceneProps) {
+ 
+export default function SummaryScene({ stats, uid, region = "na1", onShareToTwitter }: SummarySceneProps) {
   return (
     <div className="fixed inset-0 z-[9998] flex items-center justify-center pointer-events-none px-3 pt-20 sm:pt-24 md:pt-0">
       <div className="w-full max-w-2xl md:max-w-3xl text-center animate-fadeIn pointer-events-auto">
@@ -113,7 +114,7 @@ export default function SummaryScene({ stats, uid, onShareToTwitter }: SummarySc
         <div className="flex flex-col items-center space-y-2 sm:space-y-3 mt-3 sm:mt-4 md:mt-6">
           {/* Chat with AI Button - Primary CTA */}
           <Link
-            href={`/chat?uid=${encodeURIComponent(uid)}&autostart=true`}
+            href={`/chat?uid=${encodeURIComponent(uid)}&region=${region}&autostart=true`}
             className="group relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 px-6 sm:py-3.5 sm:px-8 rounded-full text-sm sm:text-base md:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl hover:shadow-purple-500/50 flex items-center space-x-2 sm:space-x-3 border border-white/20 animate-breathe"
           >
             <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

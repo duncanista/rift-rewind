@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { User, History, Menu, X, ClockFading } from "lucide-react";
+import { History, Menu, X, ClockFading } from "lucide-react";
 import { siGithub, siX } from "simple-icons";
 import SimpleIcon from "@/components/SimpleIcon";
 

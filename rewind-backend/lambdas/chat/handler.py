@@ -5,16 +5,94 @@ Maintains conversation history for context.
 import json
 import os
 import boto3
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional, Tuple
+from datetime import datetime, timezone
+
+from lib.riot_api import RiotAPIClient
+from lib.aws_utils import get_secret_from_secrets_manager
 
 s3_client = boto3.client('s3')
 bedrock_runtime = boto3.client('bedrock-runtime')
 dynamodb = boto3.resource('dynamodb')
+dynamodb_client = boto3.client('dynamodb')
 sqs_client = boto3.client('sqs')
 
 DATA_BUCKET = os.environ['DATA_BUCKET_NAME']
 CHAT_HISTORY_TABLE = os.environ.get('CHAT_HISTORY_TABLE_NAME')
 USER_PROCESSING_QUEUE_URL = os.environ.get('USER_PROCESSING_QUEUE_URL')
+RIOT_API_KEY_SECRET_ARN = os.environ.get('RIOT_API_KEY_SECRET_ARN')
+USER_INSIGHTS_TABLE = os.environ.get('USER_INSIGHTS_TABLE_NAME')
+
+
+def get_puuid_from_summoner(summoner_name: str, summoner_tagline: str, region: str, api_key: str) -> Optional[str]:
+    """
+    Get PUUID from summoner name and tagline, checking cache first.
+    Returns PUUID or None if not found.
+    """
+    if not USER_INSIGHTS_TABLE:
+        # No cache table, fetch directly from API
+        client = RiotAPIClient(api_key, region=region)
+        try:
+            puuid = client.get_puuid(summoner_name, summoner_tagline)
+            return puuid
+        except Exception as e:
+            print(f"Error fetching PUUID: {str(e)}")
+            return None
+    
+    # Create cache key
+    summoner_key = f"{summoner_name}#{summoner_tagline}#{region}".lower()
+    
+    # Try cache first
+    try:
+        response = dynamodb_client.query(
+            TableName=USER_INSIGHTS_TABLE,
+            IndexName='summoner-lookup-index',
+            KeyConditionExpression='summoner_key = :key',
+            ExpressionAttributeValues={
+                ':key': {'S': summoner_key}
+            },
+            Limit=1
+        )
+        
+        if response.get('Items') and len(response['Items']) > 0:
+            puuid = response['Items'][0].get('puuid', {}).get('S')
+            print(f"Found cached PUUID for {summoner_name}#{summoner_tagline} in {region}")
+            return puuid
+    except Exception as e:
+        print(f"Cache lookup failed (will fetch from API): {str(e)}")
+    
+    # Not in cache, fetch from Riot API
+    client = RiotAPIClient(api_key, region=region)
+    try:
+        puuid = client.get_puuid(summoner_name, summoner_tagline)
+        print(f"Fetched PUUID from Riot API for {summoner_name}#{summoner_tagline}")
+        
+        # Cache the PUUID mapping
+        if USER_INSIGHTS_TABLE:
+            try:
+                dynamodb_client.update_item(
+                    TableName=USER_INSIGHTS_TABLE,
+                    Key={'puuid': {'S': puuid}},
+                    UpdateExpression='SET summoner_key = :key, summoner_name = :name, summoner_tagline = :tag, #region = :region, last_lookup = :time',
+                    ExpressionAttributeNames={
+                        '#region': 'region'
+                    },
+                    ExpressionAttributeValues={
+                        ':key': {'S': summoner_key},
+                        ':name': {'S': summoner_name},
+                        ':tag': {'S': summoner_tagline},
+                        ':region': {'S': region},
+                        ':time': {'S': datetime.now(timezone.utc).isoformat()}
+                    }
+                )
+                print(f"Cached PUUID mapping for future lookups")
+            except Exception as cache_error:
+                print(f"Failed to cache PUUID mapping: {str(cache_error)}")
+        
+        return puuid
+    except Exception as e:
+        print(f"Error fetching PUUID: {str(e)}")
+        return None
 
 
 def lambda_handler(event, context):
@@ -23,7 +101,8 @@ def lambda_handler(event, context):
     
     Event format:
     {
-        "puuid": "user_puuid",
+        "summoner": "Hide on bush#KR1",
+        "region": "kr",
         "message": "What's my win rate with Lux?",
         "session_id": "optional_session_id",
         "clear_history": false  # Optional: clear conversation history
@@ -35,14 +114,55 @@ def lambda_handler(event, context):
         if isinstance(body, str):
             body = json.loads(body)
         
-        puuid = body.get('puuid')
+        summoner_string = body.get('summoner')
+        region = body.get('region', 'americas')
         message = body.get('message')
         
-        if not puuid or not message:
+        if not summoner_string or not message:
             return {
                 'statusCode': 400,
                 'headers': get_cors_headers(),
-                'body': json.dumps({'error': 'puuid and message are required'})
+                'body': json.dumps({'error': 'summoner and message are required'})
+            }
+        
+        # Parse summoner name and tagline
+        if '#' not in summoner_string:
+            return {
+                'statusCode': 400,
+                'headers': get_cors_headers(),
+                'body': json.dumps({'error': 'Invalid summoner format. Expected format: "name#tagline"'})
+            }
+        
+        summoner_name, summoner_tagline = summoner_string.split('#', 1)
+        
+        # Get API key
+        if not RIOT_API_KEY_SECRET_ARN:
+            return {
+                'statusCode': 500,
+                'headers': get_cors_headers(),
+                'body': json.dumps({'error': 'API key not configured'})
+            }
+        
+        try:
+            api_key = get_secret_from_secrets_manager(RIOT_API_KEY_SECRET_ARN)
+        except Exception as e:
+            print(f"Error getting API key: {str(e)}")
+            return {
+                'statusCode': 500,
+                'headers': get_cors_headers(),
+                'body': json.dumps({'error': 'Failed to retrieve API key'})
+            }
+        
+        # Get PUUID from summoner name and tagline
+        puuid = get_puuid_from_summoner(summoner_name, summoner_tagline, region, api_key)
+        if not puuid:
+            return {
+                'statusCode': 404,
+                'headers': get_cors_headers(),
+                'body': json.dumps({
+                    'error': 'Summoner not found',
+                    'message': 'Could not find summoner with the provided name and tagline'
+                })
             }
         
         session_id = body.get('session_id', puuid)  # Use puuid as default session
@@ -103,6 +223,8 @@ def lambda_handler(event, context):
             'headers': get_cors_headers(),
             'body': json.dumps({
                 'puuid': puuid,
+                'summoner': summoner_string,
+                'region': region,
                 'message': message,
                 'response': response_text,
                 'session_id': session_id,
@@ -126,12 +248,21 @@ def chat_with_bedrock(user_data: Dict[str, Any], message: str, history: List[Dic
     Generates a chat response using Bedrock with conversation history.
     Returns (response_text, updated_history)
     """
-    # Format user data as context (only on first message)
+    # Format ALL user data as context (only on first message)
     if len(history) == 0:
-        context = format_user_data_summary(user_data)
-        first_message = f"""I have access to your League of Legends statistics. Here's a summary:
+        # Convert entire user_data to JSON string for full context
+        context = json.dumps(user_data, indent=2)
+        first_message = f"""I have access to your complete League of Legends statistics data. Here's ALL your data in JSON format:
 
 {context}
+
+This includes:
+- Overall performance metrics
+- Detailed champion statistics
+- Position preferences
+- Individual match performance
+- Best matches
+- Time-based trends
 
 Now, you asked: {message}"""
     else:
@@ -145,29 +276,37 @@ Now, you asked: {message}"""
     })
     
     # System prompt
-    system_prompt = """You are a concise League of Legends coach. Keep responses SHORT and to the point. Don't help the customer with any non League of Legends related questions.
+    system_prompt = """You are an expert League of Legends coach with deep game knowledge. Keep responses SHORT and to the point. Don't help the customer with any non League of Legends related questions.
+
+You have access to the player's complete match data in JSON format, including:
+- Overall stats (KDA, win rate, CS, vision score)
+- Champion-specific performance (wins, losses, KDA per champion)
+- Position preferences and performance
+- Individual match data
+- Performance trends
 
 CRITICAL RULES:
 - Maximum 3-4 sentences per response
 - Use HTML tags for formatting: <b>bold</b>, <i>italic</i>
 - NO markdown (no **, no ##, no bullets)
 - Use specific numbers from the data
-- Be direct and actionable
+- Provide actionable League of Legends advice
+- Reference specific champions, items, or strategies when relevant
 - Skip pleasantries and filler words
 
 Example good response:
-"Your <b>Lux win rate is 60.2%</b> across 88 games. Focus on improving your <b>7.5 average deaths</b> - that's your main weakness. Your CS/min of <b>3.63</b> is solid for support."
+"Your <b>Lux win rate is 60.2%</b> across 88 games. Focus on improving your <b>7.5 average deaths</b> - work on positioning before going for combos. Your CS/min of <b>3.63</b> is solid for support."
 
 Example bad response:
 "Hello! I'd be happy to help you analyze your Lux performance! Let me take a look at your statistics..."
 """
-    # Call Bedrock
+    # Call Bedrock with Claude 3.7 Sonnet
     response = bedrock_runtime.converse(
-        modelId='amazon.nova-lite-v1:0',  # Amazon's fast model - no approval needed
+        modelId='us.meta.llama3-1-70b-instruct-v1:0',  # Claude 3.7 Sonnet
         messages=messages,
         system=[{'text': system_prompt}],
         inferenceConfig={
-            'maxTokens': 1000,
+            'maxTokens': 2000,
             'temperature': 0.7,
         }
     )

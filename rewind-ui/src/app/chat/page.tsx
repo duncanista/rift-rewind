@@ -1,139 +1,211 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import Navbar from '@/components/Navbar';
-import BlobBackground from '@/components/BlobBackground';
-import Footer from '@/components/Footer';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { MessageCircle, Send, Trash2, Sparkles, ArrowLeft } from 'lucide-react';
-import { siGithub, siX } from 'simple-icons';
-import SimpleIcon from '@/components/SimpleIcon';
+import { useState, useRef, useEffect, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import Navbar from "@/components/Navbar";
+import BlobBackground from "@/components/BlobBackground";
+import Footer from "@/components/Footer";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { MessageCircle, Send, Trash2, Sparkles, ArrowLeft } from "lucide-react";
+import { siGithub, siX } from "simple-icons";
+import SimpleIcon from "@/components/SimpleIcon";
 
 interface Message {
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
   timestamp: Date;
 }
 
-const CHAT_URL = "https://ytnsvw2ozdgewpleglwnyvn3gy0cpvvr.lambda-url.us-east-1.on.aws"
+const CHAT_URL = "https://ytnsvw2ozdgewpleglwnyvn3gy0cpvvr.lambda-url.us-east-1.on.aws";
+const CHECK_USER_STATUS_URL = "https://nbmemmnatn3kxri3sf7yccqn5e0uxglu.lambda-url.us-east-1.on.aws/";
 
 export default function ChatPage() {
   const searchParams = useSearchParams();
-  const [riotId, setRiotId] = useState('');
-  const [region, setRegion] = useState('na1');
-  const [puuid, setPuuid] = useState<string | null>(null);
+  const [riotId, setRiotId] = useState("");
+  const [region, setRegion] = useState("na1");
+  const [chatActive, setChatActive] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [sessionId, setSessionId] = useState('');
+  const [verifyingData, setVerifyingData] = useState(false);
+  const [dataAvailable, setDataAvailable] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const blobColors = useMemo(() => ['#8B5CF6', '#EC4899', '#1E40AF'], []);
+  const blobColors = useMemo(() => ["#8B5CF6", "#EC4899", "#1E40AF"], []);
+
+  // Function to verify user has aggregated data
+  const verifyUserData = async (summonerName: string, region: string) => {
+    setVerifyingData(true);
+    try {
+      const response = await fetch(CHECK_USER_STATUS_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          summoner: summonerName,
+          region: region,
+        }),
+      });
+      const data = await response.json();
+
+      if (response.status === 200) {
+        // Data is available
+        setDataAvailable(true);
+        return true;
+      } else if (response.status === 202) {
+        // Data is being processed
+        setDataAvailable(false);
+        setMessages(prev => [...prev, {
+          role: "system",
+          content: "Your data is currently being processed. Please check back in a few moments.",
+          timestamp: new Date(),
+        }]);
+        return false;
+      } else {
+        // Error or not found
+        setDataAvailable(false);
+        setMessages(prev => [...prev, {
+          role: "system",
+          content: data.error || "Unable to verify your data. Please try again.",
+          timestamp: new Date(),
+        }]);
+        return false;
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Error verifying user data:", error);
+      setDataAvailable(false);
+      setMessages(prev => [...prev, {
+        role: "system",
+        content: "Error verifying your data. Please try again.",
+        timestamp: new Date(),
+      }]);
+      return false;
+    } finally {
+      setVerifyingData(false);
+    }
+  };
 
   // Auto-start chat if coming from chronobreak
   useEffect(() => {
-    const uid = searchParams.get('uid');
-    const autostart = searchParams.get('autostart');
+    const uid = searchParams.get("uid");
+    const autostart = searchParams.get("autostart");
+    const urlRegion = searchParams.get("region");
     
-    if (uid && autostart === 'true' && !puuid) {
+    if (uid && autostart === "true" && !chatActive) {
       // Decode the Riot ID from URL
       const decodedUid = decodeURIComponent(uid);
       setRiotId(decodedUid);
       
-      // Auto-start the chat
-      const testPuuid = 'oXI0SBKPLCTZ-wCycOTTazZE3Nf8mHKv1wYLNrAcStVr6GPPqcK5z0sH1DuvV_GgqU7m-br6DMlAkg';
-      setPuuid(testPuuid);
-      setSessionId(testPuuid);
+      // Set region if provided (or use default)
+      const finalRegion = urlRegion || "na1";
+      setRegion(finalRegion);
       
+      // Auto-start the chat
+      setChatActive(true);
+      
+      // Show loading message
       setMessages([{
-        role: 'system',
-        content: `Chat started for ${decodedUid} (${region.toUpperCase()})`,
-        timestamp: new Date()
+        role: "system",
+        content: "Loading your AI-powered insights...",
+        timestamp: new Date(),
       }]);
+      
+      // Verify user data
+      verifyUserData(decodedUid, finalRegion);
     }
-  }, [searchParams, puuid, region]);
+     
+  }, [searchParams, chatActive]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleStartChat = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate Riot ID format (GameName#TAG)
-    if (!riotId.includes('#')) {
-      alert('Please enter a valid Riot ID in the format: GameName#TAG');
+    if (!riotId.includes("#")) {
+      alert("Please enter a valid Riot ID in the format: GameName#TAG");
       return;
     }
 
-    setLoading(true);
+    setChatActive(true);
     
-    // Using hardcoded test PUUID
-    const testPuuid = 'oXI0SBKPLCTZ-wCycOTTazZE3Nf8mHKv1wYLNrAcStVr6GPPqcK5z0sH1DuvV_GgqU7m-br6DMlAkg';
-    setPuuid(testPuuid);
-    setSessionId(testPuuid);
-    
+    // Show loading message
     setMessages([{
-      role: 'system',
-      content: `Chat started for ${riotId} (${region.toUpperCase()})`,
-      timestamp: new Date()
+      role: "system",
+      content: "Loading your AI-powered insights...",
+      timestamp: new Date(),
     }]);
     
-    setLoading(false);
+    // Verify user data
+    await verifyUserData(riotId, region);
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!input.trim() || !puuid) return;
+    if (!input.trim() || !chatActive || !dataAvailable) return;
 
     const userMessage: Message = {
-      role: 'user',
+      role: "user",
       content: input,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInput('');
+    setInput("");
     setLoading(true);
 
     try {
+      // Create abort controller with 120 second timeout (longer than Lambda's 90s timeout)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000);
+
       const response = await fetch(CHAT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          puuid,
+          summoner: riotId,
+          region: region,
           message: input,
-          session_id: sessionId
-        })
+        }),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
       const data = await response.json();
 
       if (response.status === 404) {
         setMessages(prev => [...prev, {
-          role: 'system',
-          content: data.message || 'No data found. Please process your matches first.',
-          timestamp: new Date()
+          role: "system",
+          content: data.message || "No data found. Please process your matches first.",
+          timestamp: new Date(),
         }]);
       } else if (response.ok) {
         setMessages(prev => [...prev, {
-          role: 'assistant',
+          role: "assistant",
           content: data.response,
-          timestamp: new Date()
+          timestamp: new Date(),
         }]);
       } else {
-        throw new Error(data.error || 'Failed to get response');
+        throw new Error(data.error || "Failed to get response");
       }
     } catch (error) {
-      console.error('Error:', error);
+      // eslint-disable-next-line no-console
+      console.error("Error:", error);
+      const errorMessage = (error as Error).name === "AbortError" 
+        ? "Request timed out. Claude is taking longer than expected. Please try again or ask a simpler question."
+        : "Error: Failed to get response. Please try again.";
       setMessages(prev => [...prev, {
-        role: 'system',
-        content: 'Error: Failed to get response. Please try again.',
-        timestamp: new Date()
+        role: "system",
+        content: errorMessage,
+        timestamp: new Date(),
       }]);
     } finally {
       setLoading(false);
@@ -142,9 +214,8 @@ export default function ChatPage() {
 
   const handleClearChat = () => {
     setMessages([]);
-    setPuuid(null);
-    setRiotId('');
-    setSessionId('');
+    setChatActive(false);
+    setRiotId("");
   };
 
   return (
@@ -158,7 +229,7 @@ export default function ChatPage() {
       />
       
       {/* Conditional Navbar - Show minimal version when chat is active */}
-      {puuid ? (
+      {chatActive ? (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/20 to-transparent backdrop-blur-md">
           <div className="w-full px-4 md:px-8 h-16 flex items-center justify-between">
             {/* Back button */}
@@ -198,7 +269,7 @@ export default function ChatPage() {
       )}
       
       <main className={`flex-1 flex flex-col items-center justify-center px-4 relative ${
-        puuid ? 'pt-20 pb-6' : 'py-6 md:py-12 min-h-[calc(100vh-64px)]'
+        chatActive ? "pt-20 pb-6" : "py-6 md:py-12 min-h-[calc(100vh-64px)]"
       }`}>
         <div className="w-full max-w-5xl relative z-10">
           {/* Header */}
@@ -214,7 +285,7 @@ export default function ChatPage() {
             </p>
           </div>
 
-          {!puuid ? (
+          {!chatActive ? (
             // Start Chat Form - Matching main page style
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-6 md:p-10 shadow-2xl shadow-black/50 hover:shadow-purple-500/20 transition-all duration-300 hover:-translate-y-1">
               <form onSubmit={handleStartChat} className="space-y-4 md:space-y-6">
@@ -229,13 +300,13 @@ export default function ChatPage() {
                     className="flex-1 border-0 bg-transparent focus:ring-0 rounded-none text-sm sm:text-base"
                   />
                   <div className="w-px bg-white/10"></div>
-                  <select
+                  <Select
                     id="region"
                     name="region"
                     value={region}
                     onChange={(e) => setRegion(e.target.value)}
                     required
-                    className="w-[80px] sm:w-[100px] border-0 bg-transparent focus:ring-0 rounded-none text-sm sm:text-base text-white"
+                    className="w-[80px] sm:w-[100px] border-0 bg-transparent focus:ring-0 rounded-none text-sm sm:text-base"
                   >
                     <option value="na1">NA</option>
                     <option value="euw1">EUW</option>
@@ -248,13 +319,13 @@ export default function ChatPage() {
                     <option value="tr1">TR</option>
                     <option value="ru">RU</option>
                     <option value="jp1">JP</option>
-                  </select>
+                  </Select>
                 </div>
 
                 <Button
                   type="submit"
                   className={`w-full py-3 md:py-4 text-base md:text-lg transition-all ${
-                    riotId ? 'animate-breathe' : ''
+                    riotId ? "animate-breathe" : ""
                   }`}
                 >
                   START CHAT
@@ -296,32 +367,32 @@ export default function ChatPage() {
                   <div
                     key={index}
                     className={`flex ${
-                      message.role === 'user' ? 'justify-end' : 'justify-start'
+                      message.role === "user" ? "justify-end" : "justify-start"
                     }`}
                   >
                     <div
                       className={`max-w-[85%] md:max-w-[75%] rounded-2xl p-4 ${
-                        message.role === 'user'
-                          ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white'
-                          : message.role === 'system'
-                          ? 'bg-yellow-500/10 border border-yellow-500/20 text-yellow-200'
-                          : 'bg-white/10 border border-white/10 text-white'
+                        message.role === "user"
+                          ? "bg-gradient-to-br from-purple-500 to-pink-500 text-white"
+                          : message.role === "system"
+                            ? "bg-yellow-500/10 border border-yellow-500/20 text-yellow-200"
+                            : "bg-white/10 border border-white/10 text-white"
                       }`}
                     >
-                      <p className="text-sm md:text-base whitespace-pre-wrap leading-relaxed" dangerouslySetInnerHTML={{ __html: message.content }} />
+                      <p className="text-sm md:text-base whitespace-pre-wrap leading-relaxed" dangerouslySetInnerHTML={{ __html: message.content.trim() }} />
                       <p className="text-xs text-gray-300 mt-2 opacity-70">
                         {message.timestamp.toLocaleTimeString()}
                       </p>
                     </div>
                   </div>
                 ))}
-                {loading && (
+                {(loading || verifyingData) && (
                   <div className="flex justify-start">
                     <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
                       </div>
                     </div>
                   </div>
@@ -336,21 +407,38 @@ export default function ChatPage() {
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Ask about your stats, champions, performance..."
+                    placeholder={
+                      verifyingData 
+                        ? "Verifying your data..." 
+                        : !dataAvailable 
+                          ? "Data not available yet..." 
+                          : "Ask about your stats, champions, performance..."
+                    }
                     className="flex-1 bg-white/5 border-white/10 focus:border-purple-500"
-                    disabled={loading}
+                    disabled={loading || verifyingData || !dataAvailable}
                   />
                   <Button
                     type="submit"
-                    disabled={loading || !input.trim()}
+                    disabled={loading || verifyingData || !dataAvailable || !input.trim()}
                     className="px-6"
                   >
                     <Send className="w-5 h-5" />
                   </Button>
                 </div>
-                <p className="text-xs text-gray-400 mt-2">
-                  Example: "What's my win rate?" or "Which champion should I focus on?"
-                </p>
+                {verifyingData ? (
+                  <p className="text-xs text-yellow-400 mt-2 flex items-center gap-2">
+                    <span className="inline-block w-3 h-3 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></span>
+                    Verifying your data...
+                  </p>
+                ) : !dataAvailable ? (
+                  <p className="text-xs text-yellow-400 mt-2">
+                    ⚠️ Your data is still being processed. Please wait a few moments and refresh the page.
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-400 mt-2">
+                    Example: &quot;What&apos;s my win rate?&quot; or &quot;Which champion should I focus on?&quot;
+                  </p>
+                )}
               </form>
             </div>
           )}

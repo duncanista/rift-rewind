@@ -122,7 +122,7 @@ CRITICAL RULES:
 
 Example format:
 "Your <b>60.2% win rate</b> on Lux is excellent. Main issue: <b>7.5 deaths per game</b> - work on positioning. Your <b>3.63 CS/min</b> is solid for support. Focus on reducing deaths and you'll climb easily."
-
+"""
     user_message = f"""Here is the player's League of Legends statistics:
 
 {context}
@@ -131,9 +131,9 @@ Player's question: {query}
 
 Please provide a detailed, insightful analysis based on this data."""
 
-    # Call Bedrock Converse API
+    # Call Bedrock Converse API with Claude 3.7 Sonnet
     response = bedrock_runtime.converse(
-        modelId='amazon.nova-lite-v1:0',  # Amazon's fast model - no approval needed
+        modelId='us.meta.llama3-1-70b-instruct-v1:0',  # Claude 3.7 Sonnet
         messages=[
             {
                 'role': 'user',
