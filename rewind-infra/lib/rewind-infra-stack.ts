@@ -310,7 +310,42 @@ export class RewindInfraStack extends cdk.Stack {
       })
     );
 
-    // Lambda 4: Aggregate User Matches (define first so it can be referenced)
+    // ===== BEDROCK AI INSIGHTS =====
+    // Define generate insights Lambda first so it can be referenced
+    const generateInsightsLambda = new lambda.Function(this, `${prefix}-generate-insights-${environment}`, {
+      functionName: `${prefix}-generate-insights-${environment}`,
+      runtime: lambda.Runtime.PYTHON_3_12,
+      handler: 'generate_insights.handler.lambda_handler',
+      code: lambdaCode,
+      timeout: cdk.Duration.seconds(90),
+      memorySize: 512,
+      environment: {
+        DATA_BUCKET_NAME: this.dataBucket.bucketName,
+        USER_PROCESSING_QUEUE_URL: this.userProcessingQueue.queueUrl,
+        ENVIRONMENT: environment!,
+      },
+      description: 'Generates AI insights using Bedrock Converse API',
+    });
+
+    // Grant permissions
+    this.dataBucket.grantRead(generateInsightsLambda);
+    this.userProcessingQueue.grantSendMessages(generateInsightsLambda);
+    generateInsightsLambda.addToRolePolicy(
+      new cdk.aws_iam.PolicyStatement({
+        effect: cdk.aws_iam.Effect.ALLOW,
+        actions: ['bedrock:*'],
+        resources: ['*'],
+      })
+    );
+    generateInsightsLambda.addToRolePolicy(
+      new cdk.aws_iam.PolicyStatement({
+        effect: cdk.aws_iam.Effect.ALLOW,
+        actions: ['aws-marketplace:ViewSubscriptions'],
+        resources: ['*'],
+      })
+    );
+
+    // Lambda 4: Aggregate User Matches
     // This Lambda aggregates all matches for a user when processing is complete
     const aggregateUserLambda = new lambda.Function(this, `${prefix}-aggregate-user-${environment}`, {
       functionName: `${prefix}-aggregate-user-${environment}`,
@@ -322,6 +357,7 @@ export class RewindInfraStack extends cdk.Stack {
       environment: {
         DATA_BUCKET_NAME: this.dataBucket.bucketName,
         USER_INSIGHTS_TABLE_NAME: this.userInsightsTable.tableName,
+        GENERATE_INSIGHTS_FUNCTION_NAME: generateInsightsLambda.functionName,
         ENVIRONMENT: environment!,
       },
       description: 'Aggregates all matches for a user when processing is complete',
@@ -330,6 +366,7 @@ export class RewindInfraStack extends cdk.Stack {
     // Grant permissions
     this.dataBucket.grantReadWrite(aggregateUserLambda);
     this.userInsightsTable.grantReadWriteData(aggregateUserLambda);
+    generateInsightsLambda.grantInvoke(aggregateUserLambda);
 
     // Lambda 3: Process Individual Match (SQS-triggered)
     // This Lambda processes one match at a time
@@ -425,6 +462,76 @@ export class RewindInfraStack extends cdk.Stack {
     new cdk.CfnOutput(this, `${prefix}-aggregator-function-url`, {
       value: aggregatorUrl.url,
       description: 'Legacy Aggregator Lambda Function URL',
+    });
+
+    // Add Function URL for generate insights
+    const generateInsightsUrl = generateInsightsLambda.addFunctionUrl({
+      authType: lambda.FunctionUrlAuthType.NONE,
+      cors: {
+        allowedOrigins,
+        allowedMethods: [lambda.HttpMethod.POST],
+        allowedHeaders: ['Content-Type', 'X-Requested-With'],
+        maxAge: cdk.Duration.hours(1),
+      },
+    });
+
+    // Lambda: Chat Handler
+    const chatLambda = new lambda.Function(this, `${prefix}-chat-${environment}`, {
+      functionName: `${prefix}-chat-${environment}`,
+      runtime: lambda.Runtime.PYTHON_3_12,
+      handler: 'chat.handler.lambda_handler',
+      code: lambdaCode,
+      timeout: cdk.Duration.seconds(90),
+      memorySize: 512,
+      environment: {
+        DATA_BUCKET_NAME: this.dataBucket.bucketName,
+        USER_PROCESSING_QUEUE_URL: this.userProcessingQueue.queueUrl,
+        RIOT_API_KEY_SECRET_ARN: this.riotApiKeySecret.secretArn,
+        USER_INSIGHTS_TABLE_NAME: this.userInsightsTable.tableName,
+        ENVIRONMENT: environment!,
+      },
+      description: 'Handles chat interactions using Bedrock Converse API',
+    });
+
+    // Grant permissions
+    this.dataBucket.grantRead(chatLambda);
+    this.userProcessingQueue.grantSendMessages(chatLambda);
+    this.riotApiKeySecret.grantRead(chatLambda);
+    this.userInsightsTable.grantReadWriteData(chatLambda);
+    chatLambda.addToRolePolicy(
+      new cdk.aws_iam.PolicyStatement({
+        effect: cdk.aws_iam.Effect.ALLOW,
+        actions: ['bedrock:*'],
+        resources: ['*'],
+      })
+    );
+    chatLambda.addToRolePolicy(
+      new cdk.aws_iam.PolicyStatement({
+        effect: cdk.aws_iam.Effect.ALLOW,
+        actions: ['aws-marketplace:ViewSubscriptions'],
+        resources: ['*'],
+      })
+    );
+
+    const chatUrl = chatLambda.addFunctionUrl({
+      authType: lambda.FunctionUrlAuthType.NONE,
+      cors: {
+        allowedOrigins,
+        allowedMethods: [lambda.HttpMethod.POST],
+        allowedHeaders: ['Content-Type', 'X-Requested-With'],
+        maxAge: cdk.Duration.hours(1),
+      },
+    });
+
+    // Outputs
+    new cdk.CfnOutput(this, `${prefix}-generate-insights-url`, {
+      value: generateInsightsUrl.url,
+      description: 'Generate Insights Lambda Function URL',
+    });
+
+    new cdk.CfnOutput(this, `${prefix}-chat-url`, {
+      value: chatUrl.url,
+      description: 'Chat Lambda Function URL',
     });
   }
 }

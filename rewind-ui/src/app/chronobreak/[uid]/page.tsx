@@ -663,12 +663,12 @@ export default function ChronobreakPage() {
                 <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-yellow-500"></div>
               </div>
               
-              {/* Blue Button with Gold Glowing Borders */}
+              {/* Blue Button with White Glow */}
               <button
                 onClick={handleButtonClick}
-                className="relative font-bold py-5 px-10 sm:py-6 sm:px-12 rounded-2xl text-xl sm:text-2xl md:text-2xl transition-all duration-300 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 transform hover:scale-110 text-white shadow-2xl border-2 border-yellow-500/50 hover:border-yellow-400 hover:shadow-yellow-500/50"
+                className="relative font-bold py-5 px-10 sm:py-6 sm:px-12 rounded-2xl text-xl sm:text-2xl md:text-2xl transition-all duration-300 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 transform hover:scale-110 text-white shadow-2xl"
                 style={{
-                  boxShadow: "0 0 30px rgba(234, 179, 8, 0.5), 0 0 60px rgba(59, 130, 246, 0.3)",
+                  boxShadow: "0 0 30px rgba(255, 255, 255, 0.5), 0 0 60px rgba(59, 130, 246, 0.3)",
                 }}
               >
                 View Your Rewind
@@ -740,6 +740,7 @@ export default function ChronobreakPage() {
         <SummaryScene 
           stats={summaryStats}
           uid={uid}
+          region={region}
           onShareToTwitter={handleShareToTwitter}
         />
       )}

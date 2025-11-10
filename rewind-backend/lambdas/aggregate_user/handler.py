@@ -17,6 +17,7 @@ from lib.aws_utils import get_secret_from_secrets_manager
 # Initialize AWS clients
 s3_client = boto3.client('s3')
 dynamodb_client = boto3.client('dynamodb')
+lambda_client = boto3.client('lambda')
 
 
 def check_all_matches_processed(bucket_name: str, puuid: str, table_name: str) -> Tuple[bool, List[str]]:
@@ -200,6 +201,20 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         # Store aggregated data
         store_aggregated_data(bucket_name, user_insights_table, puuid, aggregated_data)
+        
+        # Auto-generate AI insights after aggregation
+        try:
+            insights_function = os.environ.get('GENERATE_INSIGHTS_FUNCTION_NAME')
+            if insights_function:
+                lambda_client.invoke(
+                    FunctionName=insights_function,
+                    InvocationType='Event',  # Async
+                    Payload=json.dumps({'puuid': puuid})
+                )
+                print(f"Triggered insights generation for user {puuid}")
+        except Exception as e:
+            print(f"Error triggering insights: {str(e)}")
+            # Don't fail aggregation if insights generation fails
         
         print(f"Successfully aggregated {len(match_data_list)} matches for user {puuid}")
         return {
